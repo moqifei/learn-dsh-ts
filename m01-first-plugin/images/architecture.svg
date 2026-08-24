@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="520" viewBox="0 0 820 520" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { fill:#0f172a; font-size:18px; font-weight:700; }
+      .subtitle { fill:#475569; font-size:12px; }
+      .label { fill:#0f172a; font-size:14px; font-weight:700; }
+      .code { fill:#0f172a; font-size:11px; font-family:"SF Mono",Menlo,Consolas,monospace; }
+      .muted { fill:#64748b; font-size:11px; }
+      .white { fill:#ffffff; }
+      .box-config { fill:#fff; stroke:#cbd5e1; stroke-width:2; rx:12; }
+      .box-runtime { fill:#eff6ff; stroke:#3b82f6; stroke-width:2; rx:12; }
+      .box-plugin { fill:#fff7ed; stroke:#f97316; stroke-width:2; rx:12; }
+      .card-loader { fill:#f1f5f9; stroke:#cbd5e1; stroke-width:1.5; rx:8; }
+      .card-plugin { fill:#eff6ff; stroke:#3b82f6; stroke-width:1.5; rx:8; }
+      .card-ctx { fill:#fff7ed; stroke:#f97316; stroke-width:1.5; rx:8; }
+      .card-harness { fill:#f0fdf4; stroke:#22c55e; stroke-width:1.5; rx:8; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="520" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <text x="24" y="34" class="title">m01 · 你的第一个 Cordis 插件</text>
+  <text x="24" y="54" class="subtitle">harness = 一棵由插件组合而成的树，ctx = 其中的一根树枝</text>
+
+  <!-- ===== Top Flow: 3 boxes ===== -->
+
+  <!-- Left: cordis.yml -->
+  <rect x="24" y="80" width="180" height="90" class="box-config"/>
+  <text x="40" y="108" class="label">cordis.yml</text>
+  <text x="40" y="132" class="code"># 加载清单</text>
+  <text x="40" y="152" class="code">- name: './code.ts'</text>
+  <text x="40" y="168" class="muted">告诉运行时要加载哪些插件</text>
+
+  <!-- Arrow 1 -->
+  <line x1="204" y1="125" x2="240" y2="125" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Center: Cordis 运行时 -->
+  <rect x="260" y="80" width="180" height="90" class="box-runtime"/>
+  <text x="276" y="108" class="label">Cordis 运行时</text>
+  <text x="276" y="132" class="muted">读取清单 → 组装插件树</text>
+  <line x1="270" y1="146" x2="420" y2="146" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="276" y="164" class="code">for each plugin:</text>
+
+  <!-- Arrow 2 -->
+  <line x1="440" y1="125" x2="476" y2="125" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Right: first-plugin -->
+  <rect x="496" y="80" width="180" height="90" class="box-plugin"/>
+  <text x="512" y="108" class="label">first-plugin</text>
+  <text x="512" y="132" class="code">apply(ctx: Context)</text>
+  <line x1="506" y1="146" x2="660" y2="146" stroke="#fed7aa" stroke-width="1"/>
+  <text x="512" y="164" class="code">console.log('...')</text>
+
+  <!-- ===== Output box ===== -->
+  <rect x="24" y="196" width="772" height="40" rx="10" fill="#1e293b"/>
+  <text x="40" y="222" class="white code">[first-plugin] 插件已加载，拿到了 ctx，但还没在 ctx 上挂任何东西。</text>
+
+  <!-- ===== Bottom note ===== -->
+  <text x="24" y="256" class="muted">本课是后面所有课程的"画布"——m02 将在 ctx 上注册 effect，m03 将把资源升级为可被消费的服务。</text>
+
+  <!-- ===== Key concepts: 4 cards in 2x2 grid ===== -->
+  <rect x="24" y="276" width="772" height="220" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="304" class="label">关键概念：</text>
+
+  <!-- Row 1: Cards 1-2 -->
+  <!-- Card 1: 运行时 -->
+  <rect x="40" y="318" width="170" height="85" class="card-loader"/>
+  <text x="56" y="346" class="code">运行时 (loader)</text>
+  <text x="56" y="366" class="muted">读取清单，加载插件</text>
+  <text x="56" y="386" class="muted">负责初始化整个 harness</text>
+
+  <!-- Card 2: 插件 -->
+  <rect x="230" y="318" width="170" height="85" class="card-plugin"/>
+  <text x="246" y="346" class="code" fill="#1d4ed8">插件 (plugin)</text>
+  <text x="246" y="366" class="muted">apply(ctx) 是入口函数</text>
+  <text x="246" y="386" class="muted">每个文件一个插件</text>
+
+  <!-- Row 2: Cards 3-4 -->
+  <!-- Card 3: ctx -->
+  <rect x="420" y="318" width="170" height="85" class="card-ctx"/>
+  <text x="436" y="346" class="code" fill="#c2410c">ctx (Context)</text>
+  <text x="436" y="366" class="muted">插件的"树枝"</text>
+  <text x="436" y="386" class="muted">挂载能力的容器</text>
+
+  <!-- Card 4: harness -->
+  <rect x="610" y="318" width="170" height="85" class="card-harness"/>
+  <text x="626" y="346" class="code" fill="#16a34a">harness</text>
+  <text x="626" y="366" class="muted">插件组合成的树</text>
+  <text x="626" y="386" class="muted">整个运行环境</text>
+</svg>

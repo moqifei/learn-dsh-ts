@@ -1,0 +1,18 @@
+{
+  "name": "m01-first-plugin",
+  "version": "1.0.0",
+  "description": "deepseek-harness 教程第一课：你的第一个 Cordis 插件",
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx ./node_modules/@deepseek-ai/cordis/bin.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/cordis-plugin-include": "^1.0.6",
+    "@deepseek-ai/cordis-plugin-loader": "^1.0.2",
+    "tsx": "^4.23.12"
+  }
+}
