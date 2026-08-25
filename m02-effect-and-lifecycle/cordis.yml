@@ -1,0 +1,3 @@
+# Cordis 配置清单（loader entry）
+# 运行时按这个列表把每个插件文件加载为一棵插件树。
+- name: './code.ts'

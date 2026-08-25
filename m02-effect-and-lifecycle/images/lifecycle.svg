@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="460" viewBox="0 0 820 460" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .box { fill:#fff; stroke-width:2; rx:12; }
+      .label { fill:#0f172a; font-size:14px; font-weight:700; }
+      .sub { fill:#475569; font-size:12px; }
+      .code { fill:#0f172a; font-size:11px; font-family:"SF Mono",Menlo,Consolas,monospace; }
+      .muted { fill:#94a3b8; font-size:11px; }
+      .state { fill:#f1f5f9; stroke:#64748b; stroke-width:1.5; }
+      .active { fill:#dbeafe; stroke:#3b82f6; stroke-width:2; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="460" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <text x="24" y="34" class="label" font-size="18">m02 · 生命周期与 effect：一切皆可逆</text>
+  <text x="24" y="54" class="sub">effect 体在加载时执行，返回的 disposer 在卸载时逆序执行</text>
+
+  <!-- Left: fiber state machine -->
+  <text x="24" y="92" class="label">Fiber 状态机（本课用到 ACTIVE → UNLOADING → DISPOSED）</text>
+  <rect x="24" y="104" width="120" height="40" rx="8" class="state"/>
+  <text x="44" y="129" class="sub">PENDING</text>
+  <rect x="164" y="104" width="120" height="40" rx="8" class="active"/>
+  <text x="184" y="129" class="sub">ACTIVE</text>
+  <rect x="304" y="104" width="130" height="40" rx="8" class="state"/>
+  <text x="318" y="129" class="sub">UNLOADING</text>
+  <rect x="454" y="104" width="130" height="40" rx="8" class="state"/>
+  <text x="468" y="129" class="sub">DISPOSED</text>
+  <line x1="144" y1="124" x2="162" y2="124" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="284" y1="124" x2="302" y2="124" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="434" y1="124" x2="452" y2="124" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Right: plugin tree -->
+  <text x="620" y="92" class="label">插件树（m02 新增 ctx.plugin）</text>
+  <rect x="600" y="104" width="190" height="42" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="618" y="130" class="code">lifecycle-demo (主)</text>
+  <rect x="640" y="160" width="170" height="38" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <text x="658" y="184" class="code">heartbeat (子)</text>
+  <line x1="695" y1="146" x2="720" y2="158" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Timeline / sequence -->
+  <text x="24" y="206" class="label">运行时序（本课真实运行输出）</text>
+  <line x1="40" y1="226" x2="40" y2="430" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="52" y="244" class="code">1. 主插件 apply(ctx) 执行</text>
+  <text x="52" y="266" class="code">2. ctx.plugin(heartbeat) → 子插件加载</text>
+  <text x="52" y="288" class="code">3. 子插件 effect 体跑：setInterval(tick)</text>
+  <text x="52" y="310" class="code">4. 主插件 effect 体跑：setTimeout 700ms</text>
+  <text x="52" y="332" class="code">5. tick ×3 ...</text>
+  <text x="52" y="354" class="code">6. 700ms 到 → fiber.dispose()</text>
+  <text x="52" y="376" class="code">7. UNLOADING：子 disposer 执行 → clearInterval</text>
+  <text x="52" y="398" class="code">8. DISPOSED：定时器已清理，process.exit</text>
+  <text x="52" y="420" class="muted">disposers 按逆序执行：后注册先清理</text>
+
+  <!-- bottom note -->
+  <rect x="24" y="438" width="772" height="14" fill="none"/>
+  <text x="24" y="452" class="muted">对比 m01：m01 的 ctx 是空的；m02 在同样的 ctx 上"长"出了两个 effect 资源，且能干净卸载。</text>
+</svg>
