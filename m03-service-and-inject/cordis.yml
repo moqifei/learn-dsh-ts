@@ -1,0 +1,4 @@
+# Cordis 配置清单（loader entry）
+# 单文件版：只加载 code.ts，由它在内部用 ctx.plugin 挂 provider + consumer。
+# （greeter.ts / consumer.ts 是"分文件对比版"，本课程不在此清单中。）
+- name: './code.ts'

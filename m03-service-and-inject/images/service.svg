@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="420" viewBox="0 0 820 420" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .label { fill:#0f172a; font-size:14px; font-weight:700; }
+      .sub { fill:#475569; font-size:12px; }
+      .code { fill:#0f172a; font-size:11px; font-family:"SF Mono",Menlo,Consolas,monospace; }
+      .muted { fill:#94a3b8; font-size:11px; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="420" fill="#f8fafc"/>
+  <text x="24" y="34" class="label" font-size="18">m03 · Service 与 inject：依赖决定激活，而非文件顺序</text>
+  <text x="24" y="54" class="sub">提供方把能力挂到 ctx.greeter；消费方用 inject 声明需要它，就绪才激活</text>
+
+  <!-- provider box -->
+  <rect x="40" y="90" width="320" height="120" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="60" y="118" class="label">greeter.ts（提供方）</text>
+  <text x="60" y="142" class="code">class GreeterService extends Service</text>
+  <text x="60" y="162" class="code">  super(ctx, 'greeter')</text>
+  <text x="60" y="186" class="code">apply() { ctx.plugin(GreeterService) }</text>
+  <text x="60" y="200" class="muted">底层 = effect，卸载即移除</text>
+
+  <!-- service on ctx -->
+  <rect x="400" y="110" width="180" height="80" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+  <text x="420" y="138" class="label">ctx.greeter</text>
+  <text x="420" y="160" class="code">greet(who): string</text>
+  <text x="420" y="180" class="muted">命名能力 = 服务</text>
+
+  <!-- consumer box -->
+  <rect x="620" y="90" width="170" height="120" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <text x="638" y="118" class="label">consumer.ts</text>
+  <text x="638" y="142" class="code">inject = ['greeter']</text>
+  <text x="638" y="166" class="code">apply() {</text>
+  <text x="652" y="186" class="code">ctx.greeter.greet()</text>
+  <text x="638" y="200" class="muted">就绪才激活</text>
+
+  <!-- edges -->
+  <line x1="360" y1="150" x2="398" y2="150" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="580" y1="150" x2="618" y2="150" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- timeline -->
+  <text x="24" y="250" class="label">运行时序（颠倒 cordis.yml 顺序结果不变）</text>
+  <line x1="40" y1="270" x2="40" y2="400" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="52" y="288" class="code">1. 加载 consumer：缺少 greeter → 保持 PENDING</text>
+  <text x="52" y="312" class="code">2. 加载 greeter：注册 ctx.greeter 服务</text>
+  <text x="52" y="336" class="code">3. 依赖就绪 → consumer 从 PENDING 转入 ACTIVE</text>
+  <text x="52" y="360" class="code">4. ctx.greeter.greet('world') 执行</text>
+  <text x="52" y="384" class="code">5. 输出：Hello, world!（来自 greeter 服务）</text>
+
+  <text x="24" y="412" class="muted">对比 m02：m02 资源只能"自己用"；m03 把资源升级成可被任意插件通过名字消费的"服务"。</text>
+</svg>
