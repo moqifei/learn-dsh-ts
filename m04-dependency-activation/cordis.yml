@@ -1,0 +1,6 @@
+# Cordis 配置清单（loader entry）
+# m04：故意【反序】列出 C、B、A，证明"依赖决定激活、与 cordis.yml 行序无关"。
+# 三个文件都是独立插件，互不 import；激活顺序由依赖图（inject）决定，不是这里的行序。
+- name: './pluginC.ts'
+- name: './pluginB.ts'
+- name: './pluginA.ts'

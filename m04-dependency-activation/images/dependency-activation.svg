@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="360" font-family="Menlo, Consolas, monospace">
+  <rect width="780" height="360" fill="#fafafa"/>
+  <text x="20" y="34" font-size="18" font-weight="bold" fill="#222">m04 依赖决定激活顺序（反序写在 cordis.yml 里）</text>
+
+  <!-- cordis.yml 反序列表 -->
+  <rect x="20" y="60" width="200" height="120" rx="8" fill="#fff" stroke="#90a4ae"/>
+  <text x="34" y="84" font-size="13" font-weight="bold" fill="#37474f">cordis.yml（行序）</text>
+  <text x="34" y="108" font-size="12" fill="#c62828">- ./pluginC.ts</text>
+  <text x="34" y="130" font-size="12" fill="#c62828">- ./pluginB.ts</text>
+  <text x="34" y="152" font-size="12" fill="#c62828">- ./pluginA.ts</text>
+  <text x="34" y="172" font-size="11" fill="#888">↑ 反序：C 在 A 之前</text>
+
+  <!-- 三个独立插件节点 -->
+  <g>
+    <rect x="280" y="60" width="200" height="56" rx="8" fill="#e3f2fd" stroke="#1976d2"/>
+    <text x="300" y="82" font-size="13" fill="#1976d2">pluginC.ts</text>
+    <text x="300" y="102" font-size="12" fill="#555">consumer · inject:[a,b]</text>
+
+    <rect x="280" y="140" width="200" height="56" rx="8" fill="#e8f5e9" stroke="#388e3c"/>
+    <text x="300" y="162" font-size="13" fill="#388e3c">pluginB.ts</text>
+    <text x="300" y="182" font-size="12" fill="#555">provider-b · inject:[a] → b</text>
+
+    <rect x="280" y="220" width="200" height="56" rx="8" fill="#fff3e0" stroke="#f57c00"/>
+    <text x="300" y="242" font-size="13" fill="#f57c00">pluginA.ts</text>
+    <text x="300" y="262" font-size="12" fill="#555">provider-a · 提供 a</text>
+  </g>
+
+  <!-- 依赖箭头（依赖方向，与 yaml 行序无关） -->
+  <g stroke="#c62828" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="380" y1="116" x2="380" y2="138"/>
+    <line x1="380" y1="196" x2="380" y2="218"/>
+  </g>
+  <text x="392" y="130" font-size="11" fill="#c62828">需要 b</text>
+  <text x="392" y="210" font-size="11" fill="#c62828">需要 a</text>
+
+  <!-- reconcile 说明 -->
+  <rect x="520" y="60" width="240" height="216" rx="8" fill="#fff" stroke="#ccc"/>
+  <text x="536" y="84" font-size="13" font-weight="bold" fill="#222">reconcile（不动点扫描）</text>
+  <text x="536" y="110" font-size="12" fill="#444">yaml 反序列出 C,B,A</text>
+  <text x="536" y="132" font-size="12" fill="#444">① C 挂 → PENDING（缺 b）</text>
+  <text x="536" y="154" font-size="12" fill="#444">② B 挂 → PENDING（缺 a）</text>
+  <text x="536" y="176" font-size="12" fill="#444">③ A 挂 → a 就绪</text>
+  <text x="536" y="198" font-size="12" fill="#444">   → B 激活 → b 就绪</text>
+  <text x="536" y="220" font-size="12" fill="#444">   → C 激活 ✅</text>
+  <text x="536" y="252" font-size="11" fill="#888">激活顺序 = A→B→C</text>
+  <text x="536" y="268" font-size="11" fill="#888">（与 yaml 行序无关）</text>
+
+  <!-- 热替换 -->
+  <rect x="20" y="210" width="240" height="130" rx="8" fill="#f3e5f5" stroke="#8e24aa"/>
+  <text x="34" y="234" font-size="13" font-weight="bold" fill="#6a1b9a">热替换（在 pluginA 内）</text>
+  <text x="34" y="258" font-size="12" fill="#444">dispose A → a 消失</text>
+  <text x="34" y="280" font-size="12" fill="#444">B/C 回 PENDING</text>
+  <text x="34" y="302" font-size="12" fill="#444">挂 A2（同服务名 a）</text>
+  <text x="34" y="324" font-size="12" fill="#444">→ B/C 重新激活 ✅</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#c62828"/>
+    </marker>
+  </defs>
+</svg>

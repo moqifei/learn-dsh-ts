@@ -1,0 +1,22 @@
+{
+  "name": "m04-dependency-activation",
+  "version": "1.0.0",
+  "description": "deepseek-harness 教程第四课：依赖决定激活顺序（依赖链 + 热替换）",
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx ./node_modules/@deepseek-ai/cordis/bin.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/cordis-plugin-include": "^1.0.6",
+    "@deepseek-ai/cordis-plugin-loader": "^1.0.2",
+    "tsx": "^4.23.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
+}
