@@ -1,0 +1,12 @@
+# Cordis 配置清单（loader entry）
+# m05：事件 + waterfall。列出所有角色文件。
+# 普通事件 observer 的注册顺序无关（反序也不会错）；
+# 但 waterfall 的 chunk 有"外层/内层"语义，故 chunk-greeting 需列在 chunk-rules 之前。
+- name: './stats.ts'
+- name: './reporterConsole.ts'
+- name: './reporterLog.ts'
+- name: './prompt.ts'
+- name: './chunkGreeting.ts'
+- name: './chunkRules.ts'
+- name: './promptWatcher.ts'
+- name: './runner.ts'
