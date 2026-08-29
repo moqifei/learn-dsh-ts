@@ -1,0 +1,4 @@
+# Cordis 配置清单（loader entry）：m06 入口
+# 整棵"插件树"由 runner.ts 内的 defaultProfile 数据驱动，
+# 这里只需列出运行时入口。
+- name: './runner.ts'

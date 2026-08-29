@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="560" fill="#fafafa"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .box   { fill: #ffffff; stroke: #3a6ea5; stroke-width: 2; rx: 8; }
+      .label { font-size: 13px; fill: #222; }
+      .sub   { font-size: 11px; fill: #666; }
+      .head  { font-size: 13px; font-weight: 700; fill: #fff; }
+      .hroot { fill: #3a6ea5; }
+      .hact  { fill: #c0504d; }
+      .hskip { fill: #4f8a4f; }
+      .act   { fill: #fbe9e7; stroke: #c0504d; stroke-width: 1.5; }
+      .skip  { fill: #eaf5ea; stroke: #4f8a4f; stroke-width: 1.5; }
+      .reg   { fill: #fff7e6; stroke: #e0a838; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="30" y="34" class="title">m06 · 配置即插件树 + 结构化 diff HMR</text>
+
+  <!-- Left: profile data (tree) -->
+  <rect x="30" y="70" width="250" height="300" class="box"/>
+  <text x="155" y="95" text-anchor="middle" class="head" fill="#1a1a2e">profile（数据）</text>
+  <text x="155" y="115" text-anchor="middle" class="sub">NodeConfig[] 嵌套</text>
+  <g class="label">
+    <text x="60" y="148">● root (branch)</text>
+    <text x="90" y="172">● greeter (leaf)</text>
+    <text x="90" y="196">● pipeline (branch)</text>
+    <text x="120" y="220">● rules (leaf)</text>
+    <text x="120" y="244">● formatter (leaf)</text>
+  </g>
+  <text x="60" y="290" class="sub">每个节点带稳定 id</text>
+  <text x="60" y="308" class="sub">= HMR 的"身份证"</text>
+  <text x="60" y="340" class="sub">prev 快照 ─┐</text>
+  <text x="60" y="358" class="sub">next 快照 ─┤ diff</text>
+
+  <!-- Loader.reconcile -->
+  <rect x="330" y="170" width="200" height="100" rx="8" fill="#3a6ea5"/>
+  <text x="430" y="200" text-anchor="middle" class="head">Loader.reconcile</text>
+  <text x="430" y="222" text-anchor="middle" class="sub" fill="#dbe7f5">按稳定 id 对齐</text>
+  <text x="430" y="244" text-anchor="middle" class="sub" fill="#dbe7f5">prev vs next</text>
+
+  <!-- Right: registry Map<id, fiber> -->
+  <rect x="620" y="70" width="250" height="300" class="reg" rx="8"/>
+  <text x="745" y="95" text-anchor="middle" class="head" fill="#8a5a00">registry</text>
+  <text x="745" y="115" text-anchor="middle" class="sub">Map&lt;id, fiber&gt;</text>
+  <g class="label">
+    <text x="650" y="148">root      → fiber</text>
+    <text x="650" y="172">greeter   → fiber</text>
+    <text x="650" y="196">pipeline  → fiber</text>
+    <text x="650" y="220">rules     → fiber</text>
+    <text x="650" y="244">formatter → fiber</text>
+  </g>
+  <text x="650" y="300" class="sub">运行时 fiber 集合</text>
+  <text x="650" y="318" class="sub">被精确"对齐"到下份配置</text>
+  <text x="650" y="340" class="sub">进程不重启</text>
+
+  <!-- arrows data -> reconcile -> registry -->
+  <line x1="280" y1="220" x2="328" y2="220" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="530" y1="220" x2="618" y2="220" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Bottom: four diff outcomes -->
+  <text x="30" y="410" class="title" style="font-size:14px;">reconcile 的四种结果（外科手术式）</text>
+
+  <rect x="30"  y="430" width="200" height="100" class="act" rx="8"/>
+  <text x="130" y="458" text-anchor="middle" class="head" fill="#c0504d">prev 有 / next 无</text>
+  <text x="130" y="484" text-anchor="middle" class="label">→ dispose 整棵子树</text>
+  <text x="130" y="506" text-anchor="middle" class="sub">（递归删父+子）</text>
+
+  <rect x="250" y="430" width="200" height="100" class="act" rx="8"/>
+  <text x="350" y="458" text-anchor="middle" class="head" fill="#c0504d">prev 无 / next 有</text>
+  <text x="350" y="484" text-anchor="middle" class="label">→ plugin() 新增</text>
+  <text x="350" y="506" text-anchor="middle" class="sub">（平铺挂到 root）</text>
+
+  <rect x="470" y="430" width="200" height="100" class="act" rx="8"/>
+  <text x="570" y="458" text-anchor="middle" class="head" fill="#c0504d">同 id + config 变</text>
+  <text x="570" y="484" text-anchor="middle" class="label">→ fiber.update()</text>
+  <text x="570" y="506" text-anchor="middle" class="sub">（internal/update→restart）</text>
+
+  <rect x="690" y="430" width="180" height="100" class="skip" rx="8"/>
+  <text x="780" y="458" text-anchor="middle" class="head" fill="#4f8a4f">同 id + 不变</text>
+  <text x="780" y="484" text-anchor="middle" class="label">→ 不碰它</text>
+  <text x="780" y="506" text-anchor="middle" class="sub">（外科关键·纹丝不动）</text>
+
+  <!-- connectors from reconcile to outcomes -->
+  <line x1="430" y1="270" x2="130" y2="428" stroke="#ccc" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="430" y1="270" x2="350" y2="428" stroke="#ccc" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="430" y1="270" x2="570" y2="428" stroke="#ccc" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="430" y1="270" x2="780" y2="428" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4 3"/>
+</svg>
