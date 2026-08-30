@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arr3" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#444"/>
+    </marker>
+    <marker id="arrd" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#c0504d"/>
+    </marker>
+    <style>
+      .cls { fill:#fff; stroke:#3a6ea5; stroke-width:2; }
+      .iface { fill:#fff; stroke:#7b4f9e; stroke-width:2; }
+      .ttl { font-size:14px; font-weight:700; fill:#1a1a2e; }
+      .line { font-size:12px; fill:#333; }
+      .impl { font-size:11px; fill:#777; }
+      .secttl { font-size:11px; font-style:italic; fill:#888; }
+      .hd { fill:#3a6ea5; }
+      .hd2 { fill:#7b4f9e; }
+      .hdg { fill:#4f8a4f; }
+    </style>
+  </defs>
+
+  <rect width="900" height="600" fill="#fafafa"/>
+
+  <text x="30" y="34" class="ttl">m07 · 适配器模式（Adapter Pattern）视角：模型是 Provider 不是运行时</text>
+
+  <!-- ============ LEFT: Target interface ============ -->
+  <g>
+    <rect x="40" y="70" width="300" height="150" rx="8" class="iface"/>
+    <rect x="40" y="70" width="300" height="28" rx="8" class="hd2"/>
+    <rect x="40" y="90" width="300" height="8" fill="#7b4f9e"/>
+    <text x="190" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">«Target» LlmAdapter</text>
+    <text x="58" y="128" class="secttl">— 与提供者无关的契约 —</text>
+    <text x="58" y="152" class="line">+ generate(req: GenerateRequest)</text>
+    <text x="80" y="170" class="line">: Promise&lt;GenerateResponse&gt;</text>
+    <text x="58" y="196" class="impl">SDK 类型绝不越过这条线</text>
+  </g>
+
+  <!-- ============ RIGHT: Concrete Adapters ============ -->
+  <g>
+    <rect x="560" y="60" width="300" height="120" rx="8" class="cls"/>
+    <rect x="560" y="60" width="300" height="26" rx="8" class="hd"/>
+    <rect x="560" y="78" width="300" height="8" fill="#3a6ea5"/>
+    <text x="710" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">FakeAdapter</text>
+    <text x="578" y="116" class="line">- label: string</text>
+    <text x="578" y="140" class="line">+ generate(req): GenerateResponse</text>
+    <text x="578" y="164" class="impl">内部仅此处 import mock/fake SDK</text>
+  </g>
+  <g>
+    <rect x="560" y="220" width="300" height="120" rx="8" class="cls"/>
+    <rect x="560" y="220" width="300" height="26" rx="8" class="hd"/>
+    <rect x="560" y="238" width="300" height="8" fill="#3a6ea5"/>
+    <text x="710" y="238" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">EchoAdapter</text>
+    <text x="578" y="276" class="line">+ generate(req): GenerateResponse</text>
+    <text x="578" y="300" class="impl">把请求原样回声（另一条路由）</text>
+    <text x="578" y="320" class="impl">未来 Azure/OpenAI 同此结构</text>
+  </g>
+
+  <!-- implements arrows (FakeAdapter/EchoAdapter -> LlmAdapter) -->
+  <line x1="560" y1="120" x2="340" y2="180" stroke="#7b4f9e" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="430" y="135" text-anchor="middle" font-size="11" fill="#7b4f9e">«implements»</text>
+  <line x1="560" y1="280" x2="340" y2="200" stroke="#7b4f9e" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="430" y="245" text-anchor="middle" font-size="11" fill="#7b4f9e">«implements»</text>
+
+  <!-- ============ BOTTOM: Client ctx.llm ============ -->
+  <g>
+    <rect x="180" y="420" width="540" height="140" rx="8" class="cls"/>
+    <rect x="180" y="420" width="540" height="26" rx="8" class="hdg"/>
+    <rect x="180" y="438" width="540" height="8" fill="#4f8a4f"/>
+    <text x="450" y="438" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">LlmRuntime  (ctx.llm 服务 · Client/Registry)</text>
+    <text x="198" y="476" class="line">- adapters: Map&lt;name, LlmAdapter&gt;</text>
+    <text x="198" y="500" class="line">+ register(name, adapter: LlmAdapter)</text>
+    <text x="198" y="524" class="line">+ unregister(name)</text>
+    <text x="198" y="548" class="line">+ complete(router, req): GenerateResponse</text>
+  </g>
+
+  <!-- ctx.llm holds LlmAdapter (dependency) -->
+  <line x1="450" y1="420" x2="450" y2="240" stroke="#c0504d" stroke-width="2" marker-end="url(#arrd)"/>
+  <text x="470" y="335" font-size="11" fill="#c0504d">holds / 依赖</text>
+  <text x="470" y="352" font-size="11" fill="#c0504d">adapters.get(router)</text>
+
+  <!-- ============ Consumer call ============ -->
+  <g>
+    <rect x="40" y="430" width="100" height="120" rx="8" fill="#eef3f8" stroke="#888" stroke-width="1.5"/>
+    <text x="90" y="470" text-anchor="middle" font-size="12" font-weight="700" fill="#333">消费者</text>
+    <text x="90" y="492" text-anchor="middle" font-size="10" fill="#666">runner /</text>
+    <text x="90" y="506" text-anchor="middle" font-size="10" fill="#666">agent loop</text>
+    <text x="90" y="534" text-anchor="middle" font-size="10" fill="#444">complete(router,</text>
+    <text x="90" y="548" text-anchor="middle" font-size="10" fill="#444">req)</text>
+  </g>
+  <line x1="140" y1="490" x2="178" y2="490" stroke="#444" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="155" y="478" font-size="10" fill="#444">调用</text>
+
+  <!-- legend -->
+  <g transform="translate(700,430)">
+    <rect x="0" y="0" width="180" height="105" rx="6" fill="#fff" stroke="#bbb" stroke-width="1"/>
+    <text x="90" y="20" text-anchor="middle" font-size="11" font-weight="700" fill="#555">适配器模式映射</text>
+    <text x="12" y="42" font-size="10" fill="#333">Target   → LlmAdapter 接口</text>
+    <text x="12" y="62" font-size="10" fill="#333">Adapter  → Fake/EchoAdapter</text>
+    <text x="12" y="82" font-size="10" fill="#333">Client   → ctx.llm (持有接口)</text>
+    <text x="12" y="98" font-size="10" fill="#333">Request  → GenerateRequest</text>
+  </g>
+
+  <text x="30" y="588" font-size="11" fill="#888">要点：消费者只面向 LlmAdapter 接口编程，具体 SDK 被锁在 FakeAdapter/EchoAdapter 内部——换模型即换适配器，无需改动客户端。</text>
+</svg>

@@ -1,0 +1,4 @@
+# Cordis 配置清单（loader entry）：m07 入口
+# llm 服务需先于 runner 加载；Provider 插件由 runner 内部挂载（便于演示卸载）。
+- name: './llm.ts'
+- name: './runner.ts'

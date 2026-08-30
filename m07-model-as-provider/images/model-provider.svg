@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="520" fill="#fafafa"/>
+  <defs>
+    <marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m07 · 模型是 Provider 不是运行时（三层接缝）</text>
+
+  <!-- Layer 1: Consumer -->
+  <rect x="60" y="70" width="780" height="110" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="80" y="98" class="lhead">① 消费者（runner / 未来的 agent loop）</text>
+  <text x="80" y="120" class="lsub">只依赖 ctx.llm.complete(router, request) —— 与"哪个模型 SDK"完全无关</text>
+  <text x="80" y="142" class="lsub">交换的是与提供者无关的值：GenerateRequest / GenerateResponse</text>
+  <text x="80" y="166" class="lsub">绝不 import 任何模型 SDK</text>
+
+  <line x1="450" y1="180" x2="450" y2="214" stroke="#555" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="470" y="204" class="edge">complete(router, request)</text>
+
+  <!-- Layer 2: ctx.llm service -->
+  <rect x="60" y="216" width="780" height="120" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="80" y="246" class="lhead">② ctx.llm  (LlmRuntime Service · 能力注册表)</text>
+  <text x="80" y="270" class="lsub">register(name, adapter) / unregister(name) / complete(router, *)</text>
+  <text x="80" y="292" class="lsub">不持有任何 SDK、不发起请求</text>
+  <text x="80" y="314" class="lsub">只做：路由查找 + 重复名规则 + 未知路由报错（错误归属 llm 自身）</text>
+
+  <line x1="450" y1="336" x2="450" y2="370" stroke="#555" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="470" y="360" class="edge">按 router 查到 adapter</text>
+
+  <!-- Layer 3: Provider plugins -->
+  <rect x="60" y="372" width="780" height="120" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="80" y="402" class="lhead">③ Provider 插件（可插拔 / 可卸载）</text>
+  <text x="80" y="426" class="lsub">fakeProvider / echoProvider / 未来的 azure / openai</text>
+  <text x="80" y="448" class="lsub">每个 Provider = 一个 fiber，注册用 ctx.effect（可逆）</text>
+  <text x="80" y="470" class="lsub">仅此处 import SDK；把 SDK 对象投影进/出共享词汇（接缝）</text>
+  <text x="80" y="488" class="lsub">卸载 Provider → effect disposer 自动 unregister → 仅该路由消失</text>
+
+  <!-- right-side annotation: provider is plugin not kernel -->
+  <g transform="translate(620,400)">
+    <rect x="0" y="-8" width="200" height="92" rx="8" fill="#ffffff" stroke="#4f8a4f" stroke-width="1.5"/>
+    <text x="100" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#4f8a4f">模型只是能力</text>
+    <text x="100" y="40" text-anchor="middle" font-size="11" fill="#555">Provider 激活 → 多一条路由</text>
+    <text x="100" y="60" text-anchor="middle" font-size="11" fill="#555">Provider 卸载 → 仅该路由消失</text>
+    <text x="100" y="78" text-anchor="middle" font-size="11" fill="#555">ctx.llm 服务无感</text>
+  </g>
+
+  <!-- key principle footer -->
+  <text x="30" y="512" class="note">核心：消费者只说"用 fake 这条路由"，从不说"用哪个 SDK"；换部署（fake→echo）消费者零改动。</text>
+</svg>
