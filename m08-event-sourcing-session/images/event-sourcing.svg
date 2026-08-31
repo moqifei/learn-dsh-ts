@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrE" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .box   { fill:#fff; stroke:#3a6ea5; stroke-width:2; rx:8; }
+      .log   { fill:#fff7e6; stroke:#e0a838; stroke-width:2; }
+      .head  { font-size:13px; font-weight:700; fill:#fff; }
+      .hl    { fill:#3a6ea5; }
+      .hg    { fill:#4f8a4f; }
+      .hr    { fill:#c0504d; }
+      .label { font-size:12px; fill:#333; }
+      .sub   { font-size:11px; fill:#777; }
+    </style>
+  </defs>
+
+  <rect width="900" height="540" fill="#fafafa"/>
+  <text x="30" y="34" class="title">m08 · 事件溯源 Session：日志是真相，状态是派生</text>
+
+  <!-- LEFT: append-only log -->
+  <rect x="30" y="70" width="320" height="420" class="log" rx="8"/>
+  <rect x="30" y="70" width="320" height="30" rx="8" class="hl"/>
+  <text x="190" y="91" text-anchor="middle" class="head">append-only 事件日志</text>
+  <text x="50" y="128" class="sub">Session.events — 唯一真相</text>
+  <g class="label">
+    <text x="50" y="158">0  user/prompt        "查北京天气"</text>
+    <text x="50" y="182">1  assistant/chunk    Δ"北京今天"</text>
+    <text x="50" y="206">2  assistant/chunk    Δ"晴,22℃"</text>
+    <text x="50" y="230">3  assistant/message  "北京今天晴,22℃"</text>
+    <text x="50" y="254">4  tool/call          getWeather</text>
+    <text x="50" y="278">5  tool/result        {temp:22}</text>
+    <text x="50" y="302">6  user/prompt        "那上海呢?"</text>
+    <text x="50" y="326">7  assistant/chunk    Δ"上海"</text>
+    <text x="50" y="350">8  assistant/message  "上海多云,25℃"</text>
+  </g>
+  <text x="50" y="392" class="sub">只追加 · 带 seq · 带 time</text>
+  <text x="50" y="412" class="sub">绝不回退、绝不在原地改</text>
+  <text x="50" y="452" font-size="11" fill="#b8860b">↓ 崩溃后重放即可重建</text>
+  <text x="50" y="472" font-size="11" fill="#b8860b">↓ 审计/调试=读这份日志</text>
+
+  <!-- arrow log -> fold -->
+  <line x1="350" y1="280" x2="418" y2="280" stroke="#555" stroke-width="2" marker-end="url(#arrE)"/>
+  <text x="360" y="268" class="sub">fold（折叠）</text>
+
+  <!-- CENTER: deriveMessages pure function -->
+  <rect x="420" y="220" width="160" height="120" rx="8" class="box"/>
+  <rect x="420" y="220" width="160" height="26" rx="8" class="hg"/>
+  <text x="500" y="238" text-anchor="middle" class="head">deriveMessages</text>
+  <text x="500" y="272" text-anchor="middle" class="label">纯函数</text>
+  <text x="500" y="292" text-anchor="middle" class="label">log → ChatMessage[]</text>
+  <text x="500" y="316" text-anchor="middle" class="sub">同日志 ⇒ 同结果</text>
+
+  <!-- arrows fold -> views (three views) -->
+  <line x1="580" y1="250" x2="648" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrE)"/>
+  <line x1="580" y1="280" x2="648" y2="280" stroke="#555" stroke-width="1.5" marker-end="url(#arrE)"/>
+  <line x1="580" y1="310" x2="648" y2="410" stroke="#555" stroke-width="1.5" marker-end="url(#arrE)"/>
+
+  <!-- RIGHT: three derived views -->
+  <rect x="650" y="80" width="220" height="130" rx="8" class="box"/>
+  <text x="760" y="104" text-anchor="middle" font-size="12" font-weight="700" fill="#3a6ea5">视图① 聊天消息</text>
+  <text x="668" y="130" class="sub">user / assistant / tool</text>
+  <text x="668" y="150" class="sub">chunk 归并成一条</text>
+  <text x="668" y="170" class="sub">call/result 配对</text>
+  <text x="668" y="194" font-size="11" fill="#888">= 本课 deriveMessages</text>
+
+  <rect x="650" y="220" width="220" height="120" rx="8" class="box"/>
+  <text x="760" y="244" text-anchor="middle" font-size="12" font-weight="700" fill="#3a6ea5">视图② 统计</text>
+  <text x="668" y="270" class="sub">turns / steps / ttftMs</text>
+  <text x="668" y="290" class="sub">llmMs / toolMs …</text>
+  <text x="668" y="314" font-size="11" fill="#888">= 真实 session-stats</text>
+  <text x="668" y="332" font-size="11" fill="#888">(另一个 fold)</text>
+
+  <rect x="650" y="360" width="220" height="120" rx="8" class="box"/>
+  <text x="760" y="384" text-anchor="middle" font-size="12" font-weight="700" fill="#3a6ea5">视图③ 标题</text>
+  <text x="668" y="410" class="sub">首条 prompt → 标题</text>
+  <text x="668" y="430" class="sub">或 LLM 生成</text>
+  <text x="668" y="454" font-size="11" fill="#888">= 真实 session-title</text>
+  <text x="668" y="472" font-size="11" fill="#888">(又一个 fold)</text>
+
+  <text x="30" y="524" font-size="11" fill="#888">对比反模式：若直接改消息数组 —— 历史丢失 · 不可重放 · 每种视图各维护一份可变状态。</text>
+</svg>

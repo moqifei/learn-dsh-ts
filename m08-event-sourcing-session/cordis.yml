@@ -1,0 +1,4 @@
+# Cordis 配置清单（loader entry）：m08 入口
+# Session 是纯领域类（被 runner 内部 import），不是插件；
+# 仅 runner 作为插件入口（导出 apply）。
+- name: './runner.ts'

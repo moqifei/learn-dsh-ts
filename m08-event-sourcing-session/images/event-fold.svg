@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <marker id="arrF" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .log   { fill:#fff7e6; stroke:#e0a838; stroke-width:2; }
+      .box   { fill:#fff; stroke:#3a6ea5; stroke-width:2; rx:8; }
+      .head  { font-size:13px; font-weight:700; fill:#fff; }
+      .hl    { fill:#3a6ea5; }
+      .hg    { fill:#4f8a4f; }
+      .label { font-size:12px; fill:#333; }
+      .sub   { font-size:11px; fill:#777; }
+    </style>
+  </defs>
+
+  <rect width="900" height="540" fill="#fafafa"/>
+  <text x="30" y="34" class="title">m08 · 事件词汇映射到投影（对齐 SessionEventMap）</text>
+
+  <!-- LEFT: log with turn/step grouping -->
+  <rect x="30" y="64" width="380" height="440" class="log" rx="8"/>
+  <rect x="30" y="64" width="380" height="28" rx="8" class="hl"/>
+  <text x="220" y="84" text-anchor="middle" class="head">append-only 日志（turn/step 边界）</text>
+  <g class="label">
+    <text x="48" y="120">turn/start        t=1</text>
+    <text x="48" y="142">user/message      "查北京天气"   ●user</text>
+    <text x="48" y="166">step/start        step=1</text>
+    <text x="48" y="188">request/header    (provider/model)</text>
+    <text x="48" y="210">assistant/chunk   Δ"北京今天"</text>
+    <text x="48" y="232">assistant/chunk   Δ"晴,22℃"</text>
+    <text x="48" y="254">assistant/message "北京今天晴,22℃" ●msg</text>
+    <text x="48" y="276">tool/call         getWeather   ●tool</text>
+    <text x="48" y="298">tool/result       {temp:22}    ●tool</text>
+    <text x="48" y="322">step/start        step=2</text>
+    <text x="48" y="344">assistant/chunk   Δ"已为你查到"</text>
+    <text x="48" y="366">assistant/message "已为你查到…"    ●msg</text>
+    <text x="48" y="388">turn/end          completed</text>
+  </g>
+  <text x="48" y="424" class="sub">● = surface 事件（进消息视图）</text>
+  <text x="48" y="444" class="sub">其余 = 边界/元数据（仅折叠用）</text>
+
+  <!-- arrows to two projections -->
+  <line x1="410" y1="200" x2="478" y2="150" stroke="#555" stroke-width="2" marker-end="url(#arrF)"/>
+  <line x1="410" y1="260" x2="478" y2="360" stroke="#555" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="420" y="190" class="sub">fold →</text>
+  <text x="420" y="300" class="sub">fold →</text>
+
+  <!-- TOP projection: messages -->
+  <rect x="480" y="90" width="390" height="180" rx="8" class="box"/>
+  <rect x="480" y="90" width="390" height="26" rx="8" class="hg"/>
+  <text x="675" y="108" text-anchor="middle" class="head">投影① deriveMessages()</text>
+  <g class="label">
+    <text x="498" y="138">user      | 查北京天气</text>
+    <text x="498" y="164">assistant | 北京今天晴,22℃</text>
+    <text x="498" y="190">tool      | call getWeather</text>
+    <text x="498" y="216">tool      | → {temp:22}</text>
+    <text x="498" y="242">assistant | 已为你查到…</text>
+  </g>
+
+  <!-- BOTTOM projection: stats -->
+  <rect x="480" y="300" width="390" height="200" rx="8" class="box"/>
+  <rect x="480" y="300" width="390" height="26" rx="8" class="hg"/>
+  <text x="675" y="318" text-anchor="middle" class="head">投影② deriveStats()</text>
+  <g class="label">
+    <text x="498" y="350">turns  = turn/start 次数 = 1</text>
+    <text x="498" y="378">steps  = step/start 次数 = 2</text>
+    <text x="498" y="406">ttftMs = 首个 chunk 相对</text>
+    <text x="520" y="424">step/start 的延迟和 = 21</text>
+    <text x="498" y="452">toolMs = result 相对</text>
+    <text x="520" y="470">call 的耗时和    = 7</text>
+  </g>
+
+  <text x="30" y="524" font-size="11" fill="#888">同一份日志，两个投影；真实实现中每个投影都是独立可插拔单元（ProjectionDefinition）。</text>
+</svg>
