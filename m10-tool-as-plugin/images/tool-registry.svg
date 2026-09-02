@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="540" fill="#fafafa"/>
+  <defs>
+    <marker id="arr3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m10 · 工具即插件（注册表：多方贡献 → 投影 schema → 分发执行）</text>
+
+  <!-- Layer 1: Tool plugins (multiple subsystems) -->
+  <rect x="40" y="60" width="820" height="140" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① 工具插件（各子系统各自 register 一个工具，乱序挂载）</text>
+  <text x="60" y="106" class="lsub">每个插件只调用 ctx.tools.register({name, description, parameters, execute})，注册即 effect</text>
+
+  <g transform="translate(60,122)">
+    <rect x="0" y="0" width="150" height="62" rx="6" fill="#2e5984"/>
+    <text x="75" y="20" text-anchor="middle" class="cname">memory 子系统</text>
+    <text x="75" y="40" text-anchor="middle" class="csub">read_note</text>
+    <text x="75" y="54" text-anchor="middle" class="csub">execute: 查记忆</text>
+  </g>
+  <g transform="translate(230,122)">
+    <rect x="0" y="0" width="150" height="62" rx="6" fill="#2e5984"/>
+    <text x="75" y="20" text-anchor="middle" class="cname">检索子系统</text>
+    <text x="75" y="40" text-anchor="middle" class="csub">web_search</text>
+    <text x="75" y="54" text-anchor="middle" class="csub">execute: 搜网页</text>
+  </g>
+  <g transform="translate(400,122)">
+    <rect x="0" y="0" width="150" height="62" rx="6" fill="#2e5984"/>
+    <text x="75" y="20" text-anchor="middle" class="cname">计算子系统</text>
+    <text x="75" y="40" text-anchor="middle" class="csub">add</text>
+    <text x="75" y="54" text-anchor="middle" class="csub">execute: a+b</text>
+  </g>
+  <g transform="translate(570,122)">
+    <rect x="0" y="0" width="200" height="62" rx="6" fill="#2e5984"/>
+    <text x="100" y="20" text-anchor="middle" class="cname">… 任意新插件</text>
+    <text x="100" y="40" text-anchor="middle" class="csub">register 即接入</text>
+    <text x="100" y="54" text-anchor="middle" class="csub">无需改调度者</text>
+  </g>
+
+  <line x1="450" y1="200" x2="450" y2="234" stroke="#555" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="470" y="224" class="edge">各自 register() 注册</text>
+
+  <!-- Layer 2: ToolRegistry -->
+  <rect x="40" y="236" width="820" height="120" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="262" class="lhead">② ToolRegistry 服务（ctx.tools）</text>
+  <text x="60" y="286" class="lsub">schemas()：投影模型可见的 {name, description, parameters}（排除 execute）</text>
+  <text x="60" y="308" class="lsub">execute(name, args)：经权威 Map 分发 → 调用对应 execute（调度者不关心谁实现）</text>
+  <text x="60" y="330" class="lsub">register 返回 cordis effect disposer → 插件卸载即撤销该工具 + emit('tools/change')</text>
+
+  <line x1="450" y1="356" x2="450" y2="390" stroke="#555" stroke-width="2" marker-end="url(#arr3)"/>
+  <text x="470" y="380" class="edge">schemas() → 给模型；execute() → 出结果</text>
+
+  <!-- Layer 3: Model-facing -->
+  <rect x="40" y="392" width="820" height="110" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="418" class="lhead">③ 模型可见 / 调度者调用</text>
+  <text x="60" y="442" class="lsub">模型看到工具菜单：read_note / web_search / add（不含实现细节）</text>
+  <text x="60" y="464" class="lsub">模型选出工具 → 调度者 execute(name, args) → 注册表分发 → 返回结果</text>
+  <text x="60" y="486" class="lsub">卸载某插件 → 工具从 schemas 消失 → 模型下次不再选它</text>
+
+  <g transform="translate(560,408)">
+    <rect x="0" y="0" width="270" height="76" rx="8" fill="#ffffff" stroke="#4f8a4f" stroke-width="1.5"/>
+    <text x="135" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#4f8a4f">工具 = 插件</text>
+    <text x="135" y="44" text-anchor="middle" font-size="11" fill="#555">注册即接入</text>
+    <text x="135" y="62" text-anchor="middle" font-size="11" fill="#555">卸载即撤销（effect 可逆）</text>
+  </g>
+
+  <text x="30" y="532" class="note">核心：工具没有"中心注册表的主人"——每个能力模块贡献一个，调度者只按 name 分发，加入新工具零改调度代码。</text>
+</svg>

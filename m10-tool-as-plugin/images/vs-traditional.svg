@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="420" fill="#fafafa"/>
+  <defs>
+    <marker id="arr3b" markerWidth="10" markerHeight="10" refX="system" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .colh  { font-size: 15px; font-weight: 700; fill: #fff; }
+      .box   { rx: 8; }
+      .lbl   { font-size: 12px; fill: #333; }
+      .sub   { font-size: 11px; fill: #666; }
+      .note  { font-size: 12px; fill: #444; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m10 · 对比：传统硬编码工具 vs 工具即插件</text>
+
+  <!-- Left: hardcoded -->
+  <rect x="40" y="60" width="400" height="320" rx="10" fill="#8a8a8a" class="box"/>
+  <text x="240" y="86" text-anchor="middle" class="colh">传统硬编码工具</text>
+
+  <rect x="70" y="106" width="340" height="80" rx="6" fill="#ffffff" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="130" text-anchor="middle" class="lbl">一个大 switch / if-else</text>
+  <text x="240" y="150" text-anchor="middle" class="sub">case 'add': ...</text>
+  <text x="240" y="168" text-anchor="middle" class="sub">case 'search': ...</text>
+
+  <line x1="240" y1="186" x2="240" y2="214" stroke="#555" stroke-width="2" marker-end="url(#arr3b)"/>
+  <rect x="70" y="216" width="340" height="50" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="240" text-anchor="middle" class="lbl">加工具 = 改中心代码</text>
+  <text x="240" y="258" text-anchor="middle" class="sub">要动调度者，易出回归</text>
+
+  <rect x="70" y="278" width="340" height="80" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="302" text-anchor="middle" class="lbl">schema 与实现耦合</text>
+  <text x="240" y="322" text-anchor="middle" class="sub">模型看到的菜单</text>
+  <text x="240" y="342" text-anchor="middle" class="sub">要手写同步维护</text>
+
+  <!-- Right: plugin -->
+  <rect x="460" y="60" width="400" height="320" rx="10" fill="#7b4f9e" class="box"/>
+  <text x="660" y="86" text-anchor="middle" class="colh">工具即插件（本课）</text>
+
+  <rect x="490" y="106" width="340" height="80" rx="6" fill="#ffffff" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="130" text-anchor="middle" class="lbl">每个工具 = 一个插件</text>
+  <text x="660" y="150" text-anchor="middle" class="sub">register({name, schema,</text>
+  <text x="660" y="168" text-anchor="middle" class="sub">execute})，互不知道</text>
+
+  <line x1="660" y1="186" x2="660" y2="214" stroke="#fff" stroke-width="2" marker-end="url(#arr3b)"/>
+  <rect x="490" y="216" width="340" height="50" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="240" text-anchor="middle" class="lbl">加工具 = 挂载新插件</text>
+  <text x="660" y="258" text-anchor="middle" class="sub">不动调度者，零回归</text>
+
+  <rect x="490" y="278" width="340" height="80" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="302" text-anchor="middle" class="lbl">schema 自动投影</text>
+  <text x="660" y="322" text-anchor="middle" class="sub">schemas() 排除 execute</text>
+  <text x="660" y="342" text-anchor="middle" class="sub">卸载即撤销 + 事件通知</text>
+
+  <text x="30" y="412" class="note">左边是"一个中心分发所有工具"；右边是"每个工具自带 schema+实现，注册表只做投影与分发"——这正是 s11 tool registry 的设计。</text>
+</svg>

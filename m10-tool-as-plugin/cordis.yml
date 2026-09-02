@@ -1,0 +1,5 @@
+# Cordis 配置清单（loader entry）：m10 入口
+# tools 服务需先于 runner；工具插件由 plugins 内挂载（演示"工具即插件"）。
+- name: './tool.ts'
+- name: './plugins.ts'
+- name: './runner.ts'

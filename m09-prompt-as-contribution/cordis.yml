@@ -1,0 +1,5 @@
+# Cordis 配置清单（loader entry）：m09 入口
+# prompt 注册表服务 + 多个贡献插件 + runner（演示）
+- name: './prompt.ts'
+- name: './contributors.ts'
+- name: './runner.ts'

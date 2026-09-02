@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="560" fill="#fafafa"/>
+  <defs>
+    <marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m09 · Prompt 是多方贡献（组装管线：乱序挂载 → 按 order 排序 → 渲染）</text>
+
+  <!-- Layer 1: Contributors (multiple plugins,乱序挂载) -->
+  <rect x="40" y="60" width="820" height="140" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① 多方贡献插件（各自 section()，乱序挂载，互不知道彼此）</text>
+  <text x="60" y="106" class="lsub">每个插件只声明自己的 (name, order, text|provider)，注册即一个可逆 effect</text>
+
+  <!-- contributor cards: 6 cards evenly fit inside the blue layer (40..860, inner 52..848) -->
+  <g transform="translate(52,122)">
+    <rect x="0"   y="0" width="116" height="62" rx="6" fill="#2e5984"/>
+    <text x="58"  y="20" text-anchor="middle" class="cname">harness:identity</text>
+    <text x="58"  y="40" text-anchor="middle" class="csub">order=10</text>
+    <text x="58"  y="54" text-anchor="middle" class="csub">text 静态</text>
+  </g>
+  <g transform="translate(186,122)">
+    <rect x="0"   y="0" width="116" height="62" rx="6" fill="#2e5984"/>
+    <text x="58"  y="20" text-anchor="middle" class="cname">skill:catalog</text>
+    <text x="58"  y="40" text-anchor="middle" class="csub">order=40</text>
+    <text x="58"  y="54" text-anchor="middle" class="csub">text 静态</text>
+  </g>
+  <g transform="translate(320,122)">
+    <rect x="0"   y="0" width="116" height="62" rx="6" fill="#2e5984"/>
+    <text x="58"  y="20" text-anchor="middle" class="cname">workspace</text>
+    <text x="58"  y="40" text-anchor="middle" class="csub">order=30</text>
+    <text x="58"  y="54" text-anchor="middle" class="csub">text 含{{cwd}}</text>
+  </g>
+  <g transform="translate(454,122)">
+    <rect x="0"   y="0" width="116" height="62" rx="6" fill="#2e5984"/>
+    <text x="58"  y="20" text-anchor="middle" class="cname">memory:recall</text>
+    <text x="58"  y="40" text-anchor="middle" class="csub">order=35</text>
+    <text x="58"  y="54" text-anchor="middle" class="csub">text 静态</text>
+  </g>
+  <g transform="translate(588,122)">
+    <rect x="0"   y="0" width="116" height="62" rx="6" fill="#2e5984"/>
+    <text x="58"  y="20" text-anchor="middle" class="cname">runtime:clock</text>
+    <text x="58"  y="40" text-anchor="middle" class="csub">order=50</text>
+    <text x="58"  y="54" text-anchor="middle" class="csub">provider 动态</text>
+  </g>
+  <g transform="translate(722,122)">
+    <rect x="0"   y="0" width="116" height="62" rx="6" fill="#2e5984"/>
+    <text x="58"  y="20" text-anchor="middle" class="cname">deployment</text>
+    <text x="58"  y="40" text-anchor="middle" class="csub">order=20</text>
+    <text x="58"  y="54" text-anchor="middle" class="csub">text 含{{lang}}</text>
+  </g>
+
+  <line x1="450" y1="200" x2="450" y2="234" stroke="#555" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="470" y="224" class="edge">各自 section() 注册</text>
+
+  <!-- Layer 2: PromptRegistry -->
+  <rect x="40" y="236" width="820" height="120" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="262" class="lhead">② PromptRegistry 服务（ctx.prompt）</text>
+  <text x="60" y="286" class="lsub">assemble(meta)：按 order 升序取所有 section → 确定性排序（与挂载顺序无关）</text>
+  <text x="60" y="308" class="lsub">render(assembly)：合并 {{cwd}} / {{lang}} 等变量 → 渲染为完整文本</text>
+  <text x="60" y="330" class="lsub">严格变量：遇未知 {{missing}} → assemble 阶段即抛错（在发请求前失败）</text>
+
+  <line x1="450" y1="356" x2="450" y2="390" stroke="#555" stroke-width="2" marker-end="url(#arr2)"/>
+  <text x="470" y="380" class="edge">render() → string</text>
+
+  <!-- Layer 3: Final system prompt -->
+  <rect x="40" y="392" width="820" height="120" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="418" class="lhead">③ 最终系统提示词（单一字符串，发给模型）</text>
+  <text x="60" y="442" class="lsub">harness:identity → deployment → workspace → memory → skill → runtime:clock</text>
+  <text x="60" y="464" class="lsub">卸载某贡献 fiber → 该 section 从下一次 assemble 自动消失（effect 可逆）</text>
+  <text x="60" y="486" class="lsub">clock 段每次重算时间戳，无需重新注册</text>
+
+  <!-- right annotation: deterministic -->
+  <g transform="translate(560,408)">
+    <rect x="0" y="0" width="270" height="92" rx="8" fill="#ffffff" stroke="#4f8a4f" stroke-width="1.5"/>
+    <text x="135" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#4f8a4f">乱序挂载 ≠ 乱序渲染</text>
+    <text x="135" y="44" text-anchor="middle" font-size="11" fill="#555">order 决定顺序</text>
+    <text x="135" y="64" text-anchor="middle" font-size="11" fill="#555">缺 order 则回退 idx</text>
+    <text x="135" y="82" text-anchor="middle" font-size="11" fill="#555">确定性 = 可复现的 diff</text>
+  </g>
+
+  <text x="30" y="552" class="note">核心：提示词没有"主人"——每个能力模块贡献一段，顺序由 order 约定，组装在服务内完成。</text>
+</svg>

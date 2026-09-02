@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="420" fill="#fafafa"/>
+  <defs>
+    <marker id="arr2b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .colh  { font-size: 15px; font-weight: 700; fill: #fff; }
+      .box   { rx: 8; }
+      .lbl   { font-size: 12px; fill: #333; }
+      .sub   { font-size: 11px; fill: #666; }
+      .note  { font-size: 12px; fill: #444; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m09 · 对比：传统单体 Prompt vs 多方贡献 Prompt</text>
+
+  <!-- Left: traditional monolith -->
+  <rect x="40" y="60" width="400" height="320" rx="10" fill="#8a8a8a" class="box"/>
+  <text x="240" y="86" text-anchor="middle" class="colh">传统单体 Prompt</text>
+
+  <rect x="70" y="106" width="340" height="80" rx="6" fill="#ffffff" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="130" text-anchor="middle" class="lbl">一个文件 / 一个函数</text>
+  <text x="240" y="150" text-anchor="middle" class="sub">identity + persona + workspace</text>
+  <text x="240" y="168" text-anchor="middle" class="sub">+ memory + skill + clock 全堆一起</text>
+
+  <line x1="240" y1="186" x2="240" y2="214" stroke="#555" stroke-width="2" marker-end="url(#arr2b)"/>
+  <rect x="70" y="216" width="340" height="50" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="240" text-anchor="middle" class="lbl">改一处 → 动整条</text>
+  <text x="240" y="258" text-anchor="middle" class="sub">无回归边界，diff 噪声大</text>
+
+  <rect x="70" y="278" width="340" height="80" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="302" text-anchor="middle" class="lbl">新增能力 = 改这个文件</text>
+  <text x="240" y="322" text-anchor="middle" class="sub">易出现 "prompt 地狱"</text>
+  <text x="240" y="342" text-anchor="middle" class="sub">变量拼接靠手工，易漏</text>
+
+  <!-- Right: multi-party contribution -->
+  <rect x="460" y="60" width="400" height="320" rx="10" fill="#7b4f9e" class="box"/>
+  <text x="660" y="86" text-anchor="middle" class="colh">多方贡献 Prompt（本课）</text>
+
+  <rect x="490" y="106" width="340" height="80" rx="6" fill="#ffffff" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="130" text-anchor="middle" class="lbl">每个能力 = 一个 section()</text>
+  <text x="660" y="150" text-anchor="middle" class="sub">插件各自声明 (order, text)</text>
+  <text x="660" y="168" text-anchor="middle" class="sub">互不知道彼此，乱序挂载</text>
+
+  <line x1="660" y1="186" x2="660" y2="214" stroke="#fff" stroke-width="2" marker-end="url(#arr2b)"/>
+  <rect x="490" y="216" width="340" height="50" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="240" text-anchor="middle" class="lbl">按 order 排序 → 合并变量</text>
+  <text x="660" y="258" text-anchor="middle" class="sub">PromptRegistry 内集中完成</text>
+
+  <rect x="490" y="278" width="340" height="80" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="302" text-anchor="middle" class="lbl">新增能力 = 挂载新插件</text>
+  <text x="660" y="322" text-anchor="middle" class="sub">不碰其他段落，diff 局部</text>
+  <text x="660" y="342" text-anchor="middle" class="sub">卸载 fiber → 该段自动消失</text>
+
+  <text x="30" y="412" class="note">左边是"一个作者写到底"；右边是"每个能力贡献一段，顺序靠约定"——这正是 s10 system-prompt 注册表的组装哲学。</text>
+</svg>
