@@ -1,0 +1,7 @@
+# Cordis 应用配置（与 m09/m10 同风格）
+# 课程演示用；实际框架 runtime 会读取此配置决定加载哪些插件 / 服务。
+plugins:
+  strategy-wrapped-execution:
+    enabled: true
+  builtin-strategies:
+    enabled: true

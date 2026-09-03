@@ -1,0 +1,14 @@
+{
+  "name": "m11-strategy-wrapped-execution",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "m11 · 策略包裹执行：工具执行是三层 waterfall 策略包裹的可插拔管线",
+  "scripts": {
+    "start": "node --experimental-strip-types runner.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.0"
+  }
+}

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="660" viewBox="0 0 900 660" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#12181f"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="660" fill="url(#bg)"/>
+
+  <!-- 标题 -->
+  <text x="28" y="42" fill="#58a6ff" font-size="20" font-weight="bold">m11 · 策略包裹执行（Strategy-Wrapped Execution）</text>
+  <text x="28" y="68" fill="#8b949e" font-size="13">一次工具调用 = 三层 waterfall 包裹的管线；策略即插件，可热插拔 / 热卸载</text>
+
+  <!-- 调用入口 -->
+  <rect x="340" y="90" width="220" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+  <text x="450" y="115" fill="#c9d1d9" font-size="14" text-anchor="middle">runtime.execute(call)</text>
+  <line x1="450" y1="132" x2="450" y2="150" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ① pre-execute -->
+  <rect x="28" y="152" width="844" height="80" rx="8" fill="#161b22" stroke="#3fb950"/>
+  <text x="48" y="176" fill="#3fb950" font-size="13" font-weight="bold">① tools/pre-execute</text>
+  <text x="852" y="176" fill="#3fb950" font-size="12" text-anchor="end">策略：guard</text>
+  <text x="48" y="200" fill="#c9d1d9" font-size="12">拦截 / 改写：danger/* → 返回 null  ⇒ 短路，不真正执行</text>
+  <text x="48" y="220" fill="#8b949e" font-size="12">return next()   // 其余放行，交给下游</text>
+  <line x1="450" y1="234" x2="450" y2="250" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ② execute（around 包裹，中心是真正执行）-->
+  <rect x="28" y="252" width="844" height="140" rx="8" fill="#161b22" stroke="#d29922"/>
+  <text x="48" y="276" fill="#d29922" font-size="13" font-weight="bold">② tools/execute（around）</text>
+  <text x="852" y="276" fill="#d29922" font-size="12" text-anchor="end">策略：timeout</text>
+  <text x="48" y="300" fill="#c9d1d9" font-size="12">包裹 run：return { ...payload, run: race(payload.run(), 50ms) }</text>
+  <line x1="450" y1="308" x2="450" y2="326" stroke="#d29922" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="240" y="328" width="420" height="52" rx="8" fill="#1c1e24" stroke="#f0883e"/>
+  <text x="450" y="350" fill="#f0883e" font-size="12" font-weight="bold" text-anchor="middle">▶ 真正执行 dispatched.run()</text>
+  <text x="450" y="368" fill="#8b949e" font-size="11" text-anchor="middle">被 around 包在中心，此刻才真正跑</text>
+  <line x1="450" y1="394" x2="450" y2="410" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ③ post-execute -->
+  <rect x="28" y="412" width="844" height="80" rx="8" fill="#161b22" stroke="#bc8cff"/>
+  <text x="48" y="436" fill="#bc8cff" font-size="13" font-weight="bold">③ tools/post-execute</text>
+  <text x="852" y="436" fill="#bc8cff" font-size="12" text-anchor="end">策略：normalize</text>
+  <text x="48" y="460" fill="#c9d1d9" font-size="12">result / error → 结构化 ToolResult</text>
+  <text x="48" y="480" fill="#8b949e" font-size="12">emit('tools/result') 广播给记忆 / 日志 / UI</text>
+  <line x1="450" y1="494" x2="450" y2="512" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 输出 -->
+  <rect x="300" y="514" width="300" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+  <text x="450" y="539" fill="#58a6ff" font-size="13" text-anchor="middle">emit('tools/result')</text>
+
+  <!-- 图例 -->
+  <rect x="28" y="572" width="844" height="74" rx="8" fill="#161b22" stroke="#30363d"/>
+  <circle cx="48" cy="594" r="3" fill="#58a6ff"/>
+  <text x="62" y="598" fill="#c9d1d9" font-size="12">策略即插件：ctx.on('tools/…', fn) 注册，返回值 disposer() 即卸载</text>
+  <circle cx="48" cy="616" r="3" fill="#d29922"/>
+  <text x="62" y="620" fill="#c9d1d9" font-size="12">包裹靠返回值：next() 忽略实参，必须 return wrapped</text>
+  <circle cx="48" cy="638" r="3" fill="#bc8cff"/>
+  <text x="62" y="642" fill="#c9d1d9" font-size="12">执行行为 = 当前挂载的策略集合；卸载插件 ⇒ 该策略从管线消失</text>
+</svg>

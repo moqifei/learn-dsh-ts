@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#12181f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="560" fill="url(#bg)"/>
+
+  <!-- 标题 -->
+  <text x="28" y="42" fill="#58a6ff" font-size="20" font-weight="bold">示例 vs deepseek-harness 真实工程实践</text>
+  <text x="28" y="68" fill="#8b949e" font-size="13">同样是"执行一次工具"：左边写死成一个函数，右边是一条可插拔管线</text>
+
+  <!-- 左：传统写死 -->
+  <rect x="28" y="88" width="402" height="364" rx="10" fill="#161b22" stroke="#8b949e"/>
+  <text x="48" y="116" fill="#8b949e" font-size="15" font-weight="bold">传统：写死的执行函数</text>
+
+  <rect x="48" y="132" width="362" height="24" rx="6" fill="#21262d"/>
+  <text x="60" y="148" fill="#c9d1d9" font-size="12">function execute(call) {</text>
+  <rect x="48" y="160" width="362" height="24" rx="6" fill="#21262d"/>
+  <text x="60" y="176" fill="#c9d1d9" font-size="12">  if (call.name.startsWith('danger'))</text>
+  <rect x="48" y="188" width="362" height="24" rx="6" fill="#21262d"/>
+  <text x="60" y="204" fill="#c9d1d9" font-size="12">    return                  // 拦截写死</text>
+  <rect x="48" y="216" width="362" height="24" rx="6" fill="#21262d"/>
+  <text x="60" y="232" fill="#c9d1d9" font-size="12">  const r = tool.run(call)  // 无超时</text>
+  <rect x="48" y="244" width="362" height="24" rx="6" fill="#21262d"/>
+  <text x="60" y="260" fill="#c9d1d9" font-size="12">  return r                  // 错误直接抛</text>
+  <rect x="48" y="272" width="362" height="24" rx="6" fill="#21262d"/>
+  <text x="60" y="288" fill="#c9d1d9" font-size="12">}</text>
+
+  <text x="48" y="324" fill="#f85149" font-size="12">✗ 拦截 / 超时 / 标准化耦合在一个函数</text>
+  <text x="48" y="348" fill="#f85149" font-size="12">✗ 无超时、无重试、无错误标准化</text>
+  <text x="48" y="372" fill="#f85149" font-size="12">✗ 换策略 = 改源码，回归面大</text>
+  <text x="48" y="396" fill="#f85149" font-size="12">✗ 关掉一条逻辑只能注释几行</text>
+
+  <!-- 中间 VS -->
+  <circle cx="450" cy="270" r="22" fill="#161b22" stroke="#30363d"/>
+  <text x="450" y="276" fill="#8b949e" font-size="13" font-weight="bold" text-anchor="middle">VS</text>
+
+  <!-- 右：策略包裹管线 -->
+  <rect x="470" y="88" width="402" height="364" rx="10" fill="#161b22" stroke="#3fb950"/>
+  <text x="490" y="116" fill="#3fb950" font-size="15" font-weight="bold">deepseek-harness：包裹管线</text>
+
+  <rect x="490" y="132" width="362" height="26" rx="6" fill="#21262d"/>
+  <text x="504" y="150" fill="#3fb950" font-size="12">pre-execute   → guard 拦截：null 短路</text>
+  <rect x="490" y="166" width="362" height="26" rx="6" fill="#21262d"/>
+  <text x="504" y="184" fill="#d29922" font-size="12">execute       → timeout：around 包裹 run</text>
+  <rect x="490" y="200" width="362" height="26" rx="6" fill="#21262d"/>
+  <text x="504" y="218" fill="#bc8cff" font-size="12">post-execute  → normalize：标准化 error</text>
+
+  <rect x="490" y="236" width="362" height="48" rx="6" fill="#0d1117" stroke="#30363d"/>
+  <text x="504" y="256" fill="#c9d1d9" font-size="12">策略 = 插件：ctx.on('tools/…', fn) 注册</text>
+  <text x="504" y="276" fill="#c9d1d9" font-size="12">卸载 = disposer()：该策略从管线消失</text>
+
+  <text x="490" y="324" fill="#3fb950" font-size="12">✓ 加一条策略 = 挂一张滤片，不动骨架</text>
+  <text x="490" y="348" fill="#3fb950" font-size="12">✓ 卸载一条策略，执行行为立刻改变</text>
+  <text x="490" y="372" fill="#3fb950" font-size="12">✓ 拦截 / 超时 / 标准化各自独立可换</text>
+  <text x="490" y="396" fill="#3fb950" font-size="12">✓ ToolRuntime 只搭管线，不认识具体策略</text>
+
+  <!-- 结论 -->
+  <rect x="28" y="470" width="844" height="64" rx="10" fill="#161b22" stroke="#58a6ff"/>
+  <text x="48" y="496" fill="#58a6ff" font-size="13" font-weight="bold">结论：执行行为 = 当前挂载的策略集合</text>
+  <text x="48" y="518" fill="#c9d1d9" font-size="12">加 / 卸一条策略都不用改 ToolRuntime —— 与 m09（Prompt 多方贡献）、m10（工具即插件）同一套思想</text>
+</svg>
