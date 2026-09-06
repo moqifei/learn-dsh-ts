@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="720" viewBox="0 0 900 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="720" fill="#fafafa"/>
+  <defs>
+    <marker id="arr12" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+      .sname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .ssub  { font-size: 10px; fill: #f5e6d3; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m12 · Loop 也是插件（装配 → 协调 → 能力服务 → 一次 turn）</text>
+
+  <!-- Layer 1: 插件装配层 -->
+  <rect x="40" y="60" width="820" height="140" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① 插件装配层：每个组件通过挂载接入（plugins.ts）</text>
+  <text x="60" y="106" class="lsub">能力插件与 loopPlugin 平级挂在 cordis Context 上；依赖服务全部就绪后，AgentLoop 才会被激活</text>
+
+  <g transform="translate(60,122)">
+    <rect x="0" y="0" width="144" height="62" rx="6" fill="#2e5984"/>
+    <text x="72" y="20" text-anchor="middle" class="cname">llmPlugin</text>
+    <text x="72" y="40" text-anchor="middle" class="csub">提供 ctx.llm</text>
+    <text x="72" y="54" text-anchor="middle" class="csub">模型服务</text>
+  </g>
+  <g transform="translate(219,122)">
+    <rect x="0" y="0" width="144" height="62" rx="6" fill="#2e5984"/>
+    <text x="72" y="20" text-anchor="middle" class="cname">sessionPlugin</text>
+    <text x="72" y="40" text-anchor="middle" class="csub">提供 ctx.session</text>
+    <text x="72" y="54" text-anchor="middle" class="csub">事件溯源</text>
+  </g>
+  <g transform="translate(378,122)">
+    <rect x="0" y="0" width="144" height="62" rx="6" fill="#2e5984"/>
+    <text x="72" y="20" text-anchor="middle" class="cname">promptPlugin</text>
+    <text x="72" y="40" text-anchor="middle" class="csub">提供 ctx.prompt</text>
+    <text x="72" y="54" text-anchor="middle" class="csub">系统提示词</text>
+  </g>
+  <g transform="translate(537,122)">
+    <rect x="0" y="0" width="144" height="62" rx="6" fill="#2e5984"/>
+    <text x="72" y="20" text-anchor="middle" class="cname">toolsPlugin</text>
+    <text x="72" y="40" text-anchor="middle" class="csub">提供 ctx.tools</text>
+    <text x="72" y="54" text-anchor="middle" class="csub">工具注册表</text>
+  </g>
+  <g transform="translate(696,122)">
+    <rect x="0" y="0" width="144" height="62" rx="6" fill="#1f4a73" stroke="#ffd479" stroke-width="1.5"/>
+    <text x="72" y="20" text-anchor="middle" class="cname">loopPlugin</text>
+    <text x="72" y="40" text-anchor="middle" class="csub">提供 ctx.agent</text>
+    <text x="72" y="54" text-anchor="middle" class="csub">循环驱动器</text>
+  </g>
+
+  <line x1="450" y1="200" x2="450" y2="234" stroke="#555" stroke-width="2" marker-end="url(#arr12)"/>
+  <text x="470" y="224" class="edge">装配完成：cordis 按名解析依赖，激活 AgentLoop</text>
+
+  <!-- Layer 2: AgentLoop -->
+  <rect x="40" y="236" width="820" height="110" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="262" class="lhead">② AgentLoop 服务（ctx.agent）：只做协调的普通插件</text>
+  <text x="60" y="286" class="lsub">static inject = ['llm', 'session', 'prompt', 'tools'] —— 声明依赖，绝不 import 任何具体实现</text>
+  <text x="60" y="306" class="lsub">只编排 turn / step 的时间顺序：不硬编码"调哪个工具、调几次"，模型自己决定</text>
+  <text x="60" y="326" class="lsub">模型自然停止：response.toolCalls.length === 0 ⇒ return response.text（没有 tool_calls 就是结束）</text>
+
+  <line x1="450" y1="346" x2="450" y2="380" stroke="#555" stroke-width="2" marker-end="url(#arr12)"/>
+  <text x="470" y="370" class="edge">static inject：能力全靠注入，Loop 自己不实现任何一步</text>
+
+  <!-- Layer 3: 能力服务层 -->
+  <rect x="40" y="382" width="820" height="150" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="408" class="lhead">③ 四个能力服务（被解析注入，可逐个替换）</text>
+  <text x="60" y="430" class="lsub">每个服务都由插件贡献：换实现 = 换插件，AgentLoop 代码一行不改</text>
+  <text x="60" y="450" class="lsub">Session 是唯一事实源：Loop 从不自持 messages[]，每次请求都从 session.messages() 投影</text>
+
+  <g transform="translate(60,458)">
+    <rect x="0" y="0" width="150" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="75" y="20" text-anchor="middle" class="cname">llm</text>
+    <text x="75" y="40" text-anchor="middle" class="csub">complete(system,</text>
+    <text x="75" y="54" text-anchor="middle" class="csub">msgs, tools)</text>
+  </g>
+  <g transform="translate(230,458)">
+    <rect x="0" y="0" width="150" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="75" y="20" text-anchor="middle" class="cname">session</text>
+    <text x="75" y="40" text-anchor="middle" class="csub">append 事件 +</text>
+    <text x="75" y="54" text-anchor="middle" class="csub">messages() 投影</text>
+  </g>
+  <g transform="translate(400,458)">
+    <rect x="0" y="0" width="150" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="75" y="20" text-anchor="middle" class="cname">prompt</text>
+    <text x="75" y="40" text-anchor="middle" class="csub">render()</text>
+    <text x="75" y="54" text-anchor="middle" class="csub">渲染系统提示词</text>
+  </g>
+  <g transform="translate(570,458)">
+    <rect x="0" y="0" width="200" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="100" y="20" text-anchor="middle" class="cname">tools</text>
+    <text x="100" y="40" text-anchor="middle" class="csub">schemas() + execute()</text>
+    <text x="100" y="54" text-anchor="middle" class="csub">卸载工具即从菜单消失</text>
+  </g>
+
+  <line x1="450" y1="532" x2="450" y2="566" stroke="#555" stroke-width="2" marker-end="url(#arr12)"/>
+  <text x="470" y="556" class="edge">一次 turn：Loop 只按顺序调用上面这些服务</text>
+
+  <!-- Layer 4: 协调流 -->
+  <rect x="40" y="568" width="820" height="112" rx="10" fill="#b26b24" class="layer"/>
+  <text x="60" y="594" class="lhead">④ 一次 turn 的协调流（Loop 只编排时间顺序）</text>
+  <text x="60" y="616" class="lsub">turn/start → [ step/start → llm.complete → assistant/message → (tool/call → tool/result)×N ] ⇒ 无 toolCalls → turn/end</text>
+
+  <g transform="translate(60,628)">
+    <rect x="0" y="0" width="146" height="42" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">turn/start</text>
+    <text x="73" y="33" text-anchor="middle" class="ssub">用户输入入会话</text>
+  </g>
+  <g transform="translate(218,628)">
+    <rect x="0" y="0" width="146" height="42" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">llm.complete</text>
+    <text x="73" y="33" text-anchor="middle" class="ssub">prompt+msgs+schemas</text>
+  </g>
+  <g transform="translate(376,628)">
+    <rect x="0" y="0" width="146" height="42" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">toolCalls?</text>
+    <text x="73" y="33" text-anchor="middle" class="ssub">模型自己决策</text>
+  </g>
+  <g transform="translate(534,628)">
+    <rect x="0" y="0" width="146" height="42" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">tools.execute</text>
+    <text x="73" y="33" text-anchor="middle" class="ssub">记 tool/call→result</text>
+  </g>
+  <g transform="translate(692,628)">
+    <rect x="0" y="0" width="146" height="42" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">turn/end</text>
+    <text x="73" y="33" text-anchor="middle" class="ssub">无调用 ⇒ 自然停止</text>
+  </g>
+
+  <text x="30" y="702" class="note">核心：Loop 不是内核而是插件——它只声明依赖、编排顺序；llm / session / prompt / tools 全都可换，换任何能力都不碰 Loop 代码。</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="460" viewBox="0 0 900 460" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="460" fill="#fafafa"/>
+  <defs>
+    <marker id="arr13b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .colh  { font-size: 15px; font-weight: 700; fill: #fff; }
+      .box   { rx: 8; }
+      .lbl   { font-size: 12px; fill: #333; }
+      .sub   { font-size: 11px; fill: #666; }
+      .note  { font-size: 12px; fill: #444; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m13 · 对比：传统全局注册 vs 作用域注册</text>
+
+  <!-- Left: 传统全局注册 -->
+  <rect x="40" y="60" width="400" height="340" rx="10" fill="#8a8a8a" class="box"/>
+  <text x="240" y="86" text-anchor="middle" class="colh">传统：一张全局表，手动 unregister</text>
+
+  <rect x="70" y="106" width="340" height="86" rx="6" fill="#ffffff" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="130" text-anchor="middle" class="lbl">所有 agent 注册进同一张大表</text>
+  <text x="240" y="150" text-anchor="middle" class="sub">globalTools = Map&lt;name, Tool&gt;()</text>
+  <text x="240" y="168" text-anchor="middle" class="sub">谁都能读写，要多加一个 owner 字段</text>
+  <text x="240" y="184" text-anchor="middle" class="sub">才能勉强区分"这个工具是谁的"</text>
+
+  <line x1="240" y1="192" x2="240" y2="216" stroke="#555" stroke-width="2" marker-end="url(#arr13b)"/>
+  <rect x="70" y="218" width="340" height="50" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="242" text-anchor="middle" class="lbl">退出时逐个手动 unregister</text>
+  <text x="240" y="260" text-anchor="middle" class="sub">漏掉一个 ⇒ 泄漏</text>
+
+  <rect x="70" y="280" width="340" height="88" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="304" text-anchor="middle" class="lbl">三个绕不开的风险</text>
+  <text x="240" y="324" text-anchor="middle" class="sub">忘记清理 → 残留泄漏</text>
+  <text x="240" y="342" text-anchor="middle" class="sub">跨 agent 互相串味</text>
+  <text x="240" y="360" text-anchor="middle" class="sub">销毁顺序错 → 引用悬空</text>
+
+  <!-- Right: 作用域注册 -->
+  <rect x="460" y="60" width="400" height="340" rx="10" fill="#7b4f9e" class="box"/>
+  <text x="660" y="86" text-anchor="middle" class="colh">作用域注册（本课）</text>
+
+  <rect x="490" y="106" width="340" height="86" rx="6" fill="#ffffff" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="130" text-anchor="middle" class="lbl">每个 agent 一棵独立的 context 子树</text>
+  <text x="660" y="150" text-anchor="middle" class="sub">createScope(root, key)</text>
+  <text x="660" y="168" text-anchor="middle" class="sub">→ 带 scopeKey 标记的 scope.ctx</text>
+  <text x="660" y="184" text-anchor="middle" class="sub">注册只挂在这棵子树上</text>
+
+  <line x1="660" y1="192" x2="660" y2="216" stroke="#fff" stroke-width="2" marker-end="url(#arr13b)"/>
+  <rect x="490" y="218" width="340" height="50" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="242" text-anchor="middle" class="lbl">scope.dispose() 一次回收</text>
+  <text x="660" y="260" text-anchor="middle" class="sub">无需逐个 unregister</text>
+
+  <rect x="490" y="280" width="340" height="88" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="304" text-anchor="middle" class="lbl">三件事统一收口到 scope</text>
+  <text x="660" y="324" text-anchor="middle" class="sub">可见性：list(scope) 只见自己</text>
+  <text x="660" y="342" text-anchor="middle" class="sub">生命周期：dispose 即整体回收</text>
+  <text x="660" y="360" text-anchor="middle" class="sub">归属：scopeOf(ctx) 读出属于谁</text>
+
+  <text x="30" y="430" class="note">左边是"注册进全局表 + 手动清理"；右边是"注册进 scope 子树 + dispose 整体回收"——这正是 deepseek-harness 的作用域设计（本示例简化为单层分桶，真实工程用 ScopeLayer 支持多层叠加）。</text>
+</svg>

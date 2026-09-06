@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="780" viewBox="0 0 900 780" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="780" fill="#fafafa"/>
+  <defs>
+    <marker id="arr13" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+      .sname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .ssub  { font-size: 10px; fill: #f5e6d3; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m13 · 作用域注册（建子树 → 分桶 → 隔离可见 → dispose 回收）</text>
+
+  <!-- Layer 1: 作用域原语 -->
+  <rect x="40" y="60" width="820" height="150" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① 作用域原语：createScope(parent, key) —— 作用域就是一棵带 tag 的 context 子树</text>
+  <text x="60" y="108" class="lsub">scopeOf(ctx)：沿父链向上找第一个 scopeKey —— 决定"这次注册属于谁"</text>
+  <text x="60" y="128" class="lsub">ScopeRegistry（ctx.scopes）：登记活跃作用域，按 key 取回 / dispose；自身也监听 scope/disposed 做自清理</text>
+
+  <g transform="translate(60,136)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">(a) parent.plugin(() =&gt; {})</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">在父 context 下建一棵子树</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">得到 fiber</text>
+  </g>
+  <g transform="translate(326,136)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">(b) fiber.ctx.extend({scopeKey})</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">给子树打 own property 标记</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">（ctx 是 proxy，不能直接赋值）</text>
+  </g>
+  <g transform="translate(592,136)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">(c) { key, ctx, dispose }</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">返回作用域对象：标识 + 子 ctx</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">+ 销毁器</text>
+  </g>
+
+  <line x1="450" y1="210" x2="450" y2="244" stroke="#555" stroke-width="2" marker-end="url(#arr13)"/>
+  <text x="470" y="234" class="edge">拿到 scope.ctx，往这棵子树上注册</text>
+
+  <!-- Layer 2: 注册表分桶 -->
+  <rect x="40" y="246" width="820" height="160" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="272" class="lhead">② Toolbox 注册表（全局 Service，按 scopeKey 分桶）</text>
+  <text x="60" y="294" class="lsub">register(scopeCtx, tool) → scopeOf(scopeCtx) 读出 key → byScope.get(key).set(name, {...tool, owner: key})</text>
+  <text x="60" y="314" class="lsub">list(scopeCtx) / get(scopeCtx, name) 只返回本桶 ⇒ agent-A 看不到 calc，天然隔离</text>
+  <text x="60" y="334" class="lsub">Service 名在整棵树全局唯一 ⇒ 不能"每 scope 一个同名 Service"，改为"单个全局 Service + 按 key 分桶"</text>
+
+  <g transform="translate(60,342)">
+    <rect x="0" y="0" width="183" height="56" rx="6" fill="#5c3a78"/>
+    <text x="91" y="20" text-anchor="middle" class="cname">byScope['agent-A']</text>
+    <text x="91" y="40" text-anchor="middle" class="csub">echo</text>
+  </g>
+  <g transform="translate(258,342)">
+    <rect x="0" y="0" width="183" height="56" rx="6" fill="#5c3a78"/>
+    <text x="91" y="20" text-anchor="middle" class="cname">byScope['agent-B']</text>
+    <text x="91" y="40" text-anchor="middle" class="csub">calc</text>
+  </g>
+  <g transform="translate(456,342)">
+    <rect x="0" y="0" width="183" height="56" rx="6" fill="#5c3a78"/>
+    <text x="91" y="20" text-anchor="middle" class="cname">byScope['agent-C']</text>
+    <text x="91" y="40" text-anchor="middle" class="csub">timer（待销毁）</text>
+  </g>
+  <g transform="translate(654,342)">
+    <rect x="0" y="0" width="183" height="56" rx="6" fill="#5c3a78"/>
+    <text x="91" y="20" text-anchor="middle" class="cname">byScope['agent-E']</text>
+    <text x="91" y="40" text-anchor="middle" class="csub">search + handler</text>
+  </g>
+
+  <line x1="450" y1="406" x2="450" y2="440" stroke="#555" stroke-width="2" marker-end="url(#arr13)"/>
+  <text x="470" y="430" class="edge">桶里装的是：注册进该作用域的一切</text>
+
+  <!-- Layer 3: 可见性与生命周期 -->
+  <rect x="40" y="442" width="820" height="150" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="468" class="lhead">③ scope 子树里能注册什么 —— 可见性与生命周期都在边界内</text>
+  <text x="60" y="490" class="lsub">注册进 scope ctx 的东西，只在这棵子树里可见：别的 scope 调用 list() 看不到它</text>
+  <text x="60" y="510" class="lsub">dispose 这棵子树时，下面四类注册被一次性全部回收，不需要逐个 unregister</text>
+
+  <g transform="translate(60,518)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">tools（工具）</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">register(scopeCtx, tool)</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">只在本 scope 的菜单里</text>
+  </g>
+  <g transform="translate(326,518)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">listener（ctx.on）</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">scope 内挂的监听器</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">dispose 后不再命中</text>
+  </g>
+  <g transform="translate(592,518)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">plugin / ctx.effect</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">能力包插件与清理回调</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">随 scope 一起消亡</text>
+  </g>
+
+  <line x1="450" y1="592" x2="450" y2="626" stroke="#555" stroke-width="2" marker-end="url(#arr13)"/>
+  <text x="470" y="616" class="edge">要回收：只需销毁这棵子树</text>
+
+  <!-- Layer 4: 销毁链路 -->
+  <rect x="40" y="628" width="820" height="112" rx="10" fill="#b26b24" class="layer"/>
+  <text x="60" y="654" class="lhead">④ 销毁链路：一次 dispose，子树 + 桶 + effect 遗书 一起回收</text>
+  <text x="60" y="676" class="lsub">cordis 在 fiber.dispose() 时自动执行该作用域内所有 ctx.effect 的清理回调（如 clearInterval）—— effect 贴遗书，dispose 按按钮</text>
+
+  <g transform="translate(60,684)">
+    <rect x="0" y="0" width="146" height="44" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">scope.dispose()</text>
+    <text x="73" y="34" text-anchor="middle" class="ssub">主动按下按钮</text>
+  </g>
+  <g transform="translate(218,684)">
+    <rect x="0" y="0" width="146" height="44" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">disposed = true</text>
+    <text x="73" y="34" text-anchor="middle" class="ssub">幂等，重复调用安全</text>
+  </g>
+  <g transform="translate(376,684)">
+    <rect x="0" y="0" width="146" height="44" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">fiber.dispose()</text>
+    <text x="73" y="34" text-anchor="middle" class="ssub">卸载整棵子树</text>
+  </g>
+  <g transform="translate(534,684)">
+    <rect x="0" y="0" width="146" height="44" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">emit('scope/disposed')</text>
+    <text x="73" y="34" text-anchor="middle" class="ssub">广播销毁事件</text>
+  </g>
+  <g transform="translate(692,684)">
+    <rect x="0" y="0" width="146" height="44" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="17" text-anchor="middle" class="sname">byScope.delete(key)</text>
+    <text x="73" y="34" text-anchor="middle" class="ssub">注册表删桶，无残留</text>
+  </g>
+
+  <text x="30" y="762" class="note">核心：作用域把"资源归属 + 生命周期 + 可见性"三者统一收口到 scope —— 注册即归属（scopeOf 读出属于谁），dispose 即回收（整棵子树一起消失），不靠程序员手动 unregister。</text>
+</svg>

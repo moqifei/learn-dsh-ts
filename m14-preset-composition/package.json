@@ -1,0 +1,11 @@
+{
+  "name": "m14-preset-composition",
+  "version": "1.0.0",
+  "private": true,
+  "description": "m14 · Preset 组合 Agent — 具名 preset 校验后，在 session scope 下挂载 persona/tool-policy 插件，审计通过后发布为独立 agent 子树",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types runner.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

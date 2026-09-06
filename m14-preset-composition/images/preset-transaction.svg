@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="780" viewBox="0 0 900 780" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="780" fill="#fafafa"/>
+  <defs>
+    <marker id="arr14" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+      .sname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .ssub  { font-size: 10px; fill: #f5e6d3; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m14 · AgentFactory.create() 事务（校验 → 开 scope → 挂载 → 审计 → 发布 / 回滚）</text>
+
+  <!-- Layer 1: preset 数据与校验 -->
+  <rect x="40" y="60" width="820" height="150" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① preset 数据与校验：resolve 失败直接抛错，根本不开 scope</text>
+  <text x="60" y="108" class="lsub">preset 是数据不是代码：presets/analyst.json = { id, persona, tools } —— 组合行为由加载器解释</text>
+  <text x="60" y="128" class="lsub">PresetStore.resolve(presetId)：任何一项不过 → 抛错（缺失 → PresetNotFoundError），无任何副作用</text>
+
+  <g transform="translate(60,136)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">存在性校验</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">文件必须存在</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">缺失 → PresetNotFoundError</text>
+  </g>
+  <g transform="translate(326,136)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">字段校验</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">恰好 {id, persona, tools}</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">persona 非空字符串</text>
+  </g>
+  <g transform="translate(592,136)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">引用校验</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">tools 非空、无重复</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">且都是已知工具（拒绝 teleport）</text>
+  </g>
+
+  <line x1="450" y1="210" x2="450" y2="244" stroke="#555" stroke-width="2" marker-end="url(#arr14)"/>
+  <text x="470" y="234" class="edge">校验通过，拿到 Preset 数据，进入事务主体</text>
+
+  <!-- Layer 2: 组合事务五步 -->
+  <rect x="40" y="246" width="820" height="160" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="272" class="lhead">② 组合事务：create(sessionId, presetId)</text>
+  <text x="60" y="294" class="lsub">audit（④）：resolvePersona(scope) 非空 且 工具箱非空 —— 不过就抛错进 catch</text>
+  <text x="60" y="314" class="lsub">publish（⑤）：sessions.set(sessionId, { agent, mounted }) —— 只有审计通过的 agent 才登记</text>
+
+  <g transform="translate(60,330)">
+    <rect x="0" y="0" width="146" height="64" rx="6" fill="#5c3a78"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">① resolve</text>
+    <text x="73" y="36" text-anchor="middle" class="ssub">解析 preset</text>
+    <text x="73" y="52" text-anchor="middle" class="ssub">失败 → 直接抛</text>
+  </g>
+  <g transform="translate(218,330)">
+    <rect x="0" y="0" width="146" height="64" rx="6" fill="#5c3a78"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">② createScope</text>
+    <text x="73" y="36" text-anchor="middle" class="ssub">开未发布子树</text>
+    <text x="73" y="52" text-anchor="middle" class="ssub">session:&lt;id&gt;</text>
+  </g>
+  <g transform="translate(376,330)">
+    <rect x="0" y="0" width="146" height="64" rx="6" fill="#5c3a78"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">③ mount 子树</text>
+    <text x="73" y="36" text-anchor="middle" class="ssub">persona-plugin</text>
+    <text x="73" y="52" text-anchor="middle" class="ssub">tool-policy-plugin</text>
+  </g>
+  <g transform="translate(534,330)">
+    <rect x="0" y="0" width="146" height="64" rx="6" fill="#5c3a78"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">④ audit</text>
+    <text x="73" y="36" text-anchor="middle" class="ssub">persona 非空？</text>
+    <text x="73" y="52" text-anchor="middle" class="ssub">tools 非空？</text>
+  </g>
+  <g transform="translate(692,330)">
+    <rect x="0" y="0" width="146" height="64" rx="6" fill="#5c3a78"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">⑤ publish</text>
+    <text x="73" y="36" text-anchor="middle" class="ssub">sessions.set</text>
+    <text x="73" y="52" text-anchor="middle" class="ssub">return agent</text>
+  </g>
+
+  <line x1="450" y1="406" x2="450" y2="440" stroke="#555" stroke-width="2" marker-end="url(#arr14)"/>
+  <text x="470" y="430" class="edge">②③④ 任一步抛错 → 进入 catch，走下面的回滚链路</text>
+
+  <!-- Layer 3: 回滚链路 -->
+  <rect x="40" y="442" width="820" height="150" rx="10" fill="#b26b24" class="layer"/>
+  <text x="60" y="468" class="lhead">③ 回滚链路：catch 里 scopes.dispose(scope.key)，agent 不进 sessions 表</text>
+  <text x="60" y="490" class="lsub">校验失败（①）：直接抛错，根本不开 scope —— 无残留</text>
+  <text x="60" y="510" class="lsub">挂载 / 审计失败（③④）：已进入 try，catch 回收未发布子树 —— 不留半吊子 agent</text>
+
+  <g transform="translate(60,520)">
+    <rect x="0" y="0" width="146" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">dispose(scope.key)</text>
+    <text x="73" y="38" text-anchor="middle" class="ssub">回滚的按钮</text>
+    <text x="73" y="54" text-anchor="middle" class="ssub">幂等，重复调用安全</text>
+  </g>
+  <g transform="translate(218,520)">
+    <rect x="0" y="0" width="146" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">fiber.dispose()</text>
+    <text x="73" y="38" text-anchor="middle" class="ssub">卸载整棵子树</text>
+    <text x="73" y="54" text-anchor="middle" class="ssub">persona + tools 一起回收</text>
+  </g>
+  <g transform="translate(376,520)">
+    <rect x="0" y="0" width="146" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">emit(scope/disposed)</text>
+    <text x="73" y="38" text-anchor="middle" class="ssub">广播销毁事件</text>
+    <text x="73" y="54" text-anchor="middle" class="ssub">注册表自清理</text>
+  </g>
+  <g transform="translate(534,520)">
+    <rect x="0" y="0" width="146" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">toolBox 桶清空</text>
+    <text x="73" y="38" text-anchor="middle" class="ssub">该 session 的工具</text>
+    <text x="73" y="54" text-anchor="middle" class="ssub">从分桶中消失</text>
+  </g>
+  <g transform="translate(692,520)">
+    <rect x="0" y="0" width="146" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="73" y="18" text-anchor="middle" class="sname">rethrow</text>
+    <text x="73" y="38" text-anchor="middle" class="ssub">错误照常抛给调用方</text>
+    <text x="73" y="54" text-anchor="middle" class="ssub">残留 session 数不变</text>
+  </g>
+
+  <line x1="450" y1="592" x2="450" y2="626" stroke="#555" stroke-width="2" marker-end="url(#arr14)"/>
+  <text x="470" y="616" class="edge">审计通过 → 发布成功，得到一个独立 agent</text>
+
+  <!-- Layer 4: 结果 -->
+  <rect x="40" y="628" width="820" height="112" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="654" class="lhead">④ 组合结果：成功 → 独立 agent；失败 → 零残留</text>
+  <text x="60" y="676" class="lsub">Agent 接口：persona() / toolNames() / callTool(name, arg) / close() —— close 内部就是 dispose 自己的 scope</text>
+
+  <g transform="translate(60,688)">
+    <rect x="0" y="0" width="246" height="40" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="17" text-anchor="middle" class="cname">成功 agent</text>
+    <text x="123" y="33" text-anchor="middle" class="csub">人设 + 工具集来自 preset</text>
+  </g>
+  <g transform="translate(326,688)">
+    <rect x="0" y="0" width="246" height="40" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="17" text-anchor="middle" class="cname">sessions 表</text>
+    <text x="123" y="33" text-anchor="middle" class="csub">只有审计通过的才登记</text>
+  </g>
+  <g transform="translate(592,688)">
+    <rect x="0" y="0" width="246" height="40" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="17" text-anchor="middle" class="cname">无半吊子</text>
+    <text x="123" y="33" text-anchor="middle" class="csub">失败时 scope 已回收，零残留</text>
+  </g>
+
+  <text x="30" y="762" class="note">核心：把"用一个 preset 创建一个 agent"做成事务——未发布 scope → 挂载 → 审计 → 发布，任一步失败回滚未发布 scope，保证不留下半吊子 session。</text>
+</svg>

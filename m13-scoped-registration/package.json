@@ -1,0 +1,11 @@
+{
+  "name": "m13-scoped-registration",
+  "version": "1.0.0",
+  "private": true,
+  "description": "m13 · 作用域注册 (Scoped Registration) — 每个 agent 一个独立 context，注册在其下只在该作用域可见、随作用域销毁",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types runner.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640" viewBox="0 0 900 640" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="640" fill="#fafafa"/>
+  <defs>
+    <marker id="arr14b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m14 · 共享运行时 + 隔离作用域（HOST 平面 vs AGENT PRESET 平面）</text>
+
+  <!-- Layer 1: HOST 平面 -->
+  <rect x="40" y="60" width="820" height="140" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① HOST 平面 · RuntimeServices（进程级常驻，永不被 session 销毁）</text>
+  <text x="60" y="108" class="lsub">callTool(sessionId, name)：调用实现 + 记遥测 —— 所有 agent 共享同一份数组与同一份实现</text>
+
+  <g transform="translate(60,124)">
+    <rect x="0" y="0" width="390" height="62" rx="6" fill="#2e5984"/>
+    <text x="195" y="20" text-anchor="middle" class="cname">telemetry: string[]</text>
+    <text x="195" y="40" text-anchor="middle" class="csub">所有 agent 的调用审计，全关后仍保留：</text>
+    <text x="195" y="54" text-anchor="middle" class="csub">["session-a:search","session-b:write_file",...]</text>
+  </g>
+  <g transform="translate(470,124)">
+    <rect x="0" y="0" width="390" height="62" rx="6" fill="#2e5984"/>
+    <text x="195" y="20" text-anchor="middle" class="cname">toolImpls: ReadonlyMap&lt;name, ToolImpl&gt;</text>
+    <text x="195" y="40" text-anchor="middle" class="csub">search · inspect_runtime · write_file</text>
+    <text x="195" y="54" text-anchor="middle" class="csub">工具实现只存一份（Service 名全局唯一约束）</text>
+  </g>
+
+  <line x1="450" y1="200" x2="450" y2="234" stroke="#555" stroke-width="2" marker-end="url(#arr14b)"/>
+  <text x="470" y="224" class="edge">所有 agent 共享同一份 HOST 平面</text>
+
+  <!-- Layer 2: AGENT PRESET 平面 -->
+  <rect x="40" y="236" width="820" height="200" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="262" class="lhead">② AGENT PRESET 平面：每个 session 一棵 scope 子树（preset 的"贡献"）</text>
+  <text x="60" y="284" class="lsub">mount 阶段在 scope.ctx 上挂 persona-plugin 与 tool-policy-plugin 两棵子树，随 scope 创建与销毁</text>
+
+  <g transform="translate(60,296)">
+    <rect x="0" y="0" width="375" height="124" rx="8" fill="#5c3a78"/>
+    <text x="187" y="24" text-anchor="middle" class="cname">scope:session-a（analyst）</text>
+    <text x="187" y="46" text-anchor="middle" class="csub">preset: analyst.json</text>
+    <text x="187" y="68" text-anchor="middle" class="csub">persona-plugin → "careful research analyst"</text>
+    <text x="187" y="90" text-anchor="middle" class="csub">tool-policy → search · inspect_runtime</text>
+    <text x="187" y="112" text-anchor="middle" class="csub">销毁 A → 只回收这两棵子树</text>
+  </g>
+  <g transform="translate(465,296)">
+    <rect x="0" y="0" width="375" height="124" rx="8" fill="#5c3a78"/>
+    <text x="187" y="24" text-anchor="middle" class="cname">scope:session-b（builder）</text>
+    <text x="187" y="46" text-anchor="middle" class="csub">preset: builder.json</text>
+    <text x="187" y="68" text-anchor="middle" class="csub">persona-plugin → "pragmatic software builder"</text>
+    <text x="187" y="90" text-anchor="middle" class="csub">tool-policy → inspect_runtime · write_file</text>
+    <text x="187" y="112" text-anchor="middle" class="csub">销毁 B → 只回收这两棵子树</text>
+  </g>
+
+  <line x1="450" y1="436" x2="450" y2="470" stroke="#555" stroke-width="2" marker-end="url(#arr14b)"/>
+  <text x="470" y="460" class="edge">子树里存的只是"引用 + 分桶状态"，不是实现本身</text>
+
+  <!-- Layer 3: 隔离语义 -->
+  <rect x="40" y="472" width="820" height="120" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="498" class="lhead">③ 共享实现、隔离状态（关一个，别的照常）</text>
+  <text x="60" y="520" class="lsub">不同 preset 组合出不同工具集；两 agent 共享同一份 RuntimeServices（scope 不同、runtime 相同）</text>
+
+  <g transform="translate(60,532)">
+    <rect x="0" y="0" width="246" height="48" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="19" text-anchor="middle" class="cname">销毁 analyst</text>
+    <text x="123" y="38" text-anchor="middle" class="csub">只回收 A 子树，builder 仍可用</text>
+  </g>
+  <g transform="translate(326,532)">
+    <rect x="0" y="0" width="246" height="48" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="19" text-anchor="middle" class="cname">builder 不受影响</text>
+    <text x="123" y="38" text-anchor="middle" class="csub">callTool(inspect_runtime) 正常</text>
+  </g>
+  <g transform="translate(592,532)">
+    <rect x="0" y="0" width="246" height="48" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="19" text-anchor="middle" class="cname">runtime 永驻</text>
+    <text x="123" y="38" text-anchor="middle" class="csub">全部关闭后遥测仍保留</text>
+  </g>
+
+  <text x="30" y="622" class="note">核心：HOST 平面常驻（跨 session 共享）；AGENT PRESET = 每个 session 的贡献（tools / persona / prompt）——共享实现、隔离状态。</text>
+</svg>

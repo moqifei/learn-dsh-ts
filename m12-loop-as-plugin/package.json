@@ -1,0 +1,14 @@
+{
+  "name": "m12-loop-as-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "m12 · Loop 也是插件：AgentLoop 通过 Service/插件生命周期进入系统，只做协调",
+  "scripts": {
+    "start": "node --experimental-strip-types runner.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.0"
+  }
+}

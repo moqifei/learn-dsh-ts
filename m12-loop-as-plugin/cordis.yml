@@ -1,0 +1,13 @@
+# Cordis 应用配置（与 m09~m11 同风格）
+# 课程演示用；实际框架 runtime 会读取此配置决定加载哪些插件 / 服务。
+plugins:
+  llm-scripted:
+    enabled: true
+  prompt-basic:
+    enabled: true
+  session-memory:
+    enabled: true
+  tools-basic:
+    enabled: true
+  agent-loop:
+    enabled: true
