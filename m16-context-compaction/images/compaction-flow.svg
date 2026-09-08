@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="760" viewBox="0 0 900 760" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="760" fill="#fafafa"/>
+  <defs>
+    <marker id="arr16" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m16 · 上下文压缩：events 只追加，surface 可替换</text>
+
+  <!-- Layer 1: events 真相源 -->
+  <rect x="40" y="60" width="820" height="140" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① events[]（只追加 · 唯一真相源）：压缩永不删改原始事件</text>
+  <text x="60" y="108" class="lsub">历史不丢 —— 压缩只替换"投影"，append-only 的事件流始终完整可回溯</text>
+
+  <g transform="translate(60,124)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">[0] system 提示词</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">stable-range 起点</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">第 0 条永不动</text>
+  </g>
+  <g transform="translate(326,124)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">[1..3] user + tool + result</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">含 800B 超长工具结果</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">中间段 → 可压缩集合</text>
+  </g>
+  <g transform="translate(592,124)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">[4] summary ← 压缩后追加</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">压缩只多这一条</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">原始 [3] 长结果仍在</text>
+  </g>
+
+  <line x1="450" y1="200" x2="450" y2="234" stroke="#555" stroke-width="2" marker-end="url(#arr16)"/>
+  <text x="470" y="224" class="edge">压力超阈值（pressure_limit_bytes）才触发，cordis.yml 配置驱动</text>
+
+  <!-- Layer 2: 压缩流水线 -->
+  <rect x="40" y="236" width="820" height="150" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="262" class="lhead">② 压缩流水线：划界 → 剪枝 → 摘要</text>
+  <text x="60" y="284" class="lsub">stable-range 先守住执行现场；超限工具结果先剪枝；中间段才生成一条 summary</text>
+  <text x="60" y="304" class="lsub">阈值全部来自 cordis.yml（pressure_limit_bytes / tool_result_prune_bytes / retain_tail），不在代码里硬编码</text>
+
+  <g transform="translate(60,312)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">selectStableRange()</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">system + 尾部 N 条</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">划为"不可压缩"</text>
+  </g>
+  <g transform="translate(326,312)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">pruneToolResult()</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">超 320B 中部省略</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">短结果原样保留</text>
+  </g>
+  <g transform="translate(592,312)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">summarize 中间段</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">N 条历史 → 一条摘要</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">教学用确定性占位摘要</text>
+  </g>
+
+  <line x1="450" y1="386" x2="450" y2="420" stroke="#555" stroke-width="2" marker-end="url(#arr16)"/>
+  <text x="470" y="410" class="edge">摘要生成后 commit：append summary 事件 + 重建 surface</text>
+
+  <!-- Layer 3: surface 重建 -->
+  <rect x="40" y="422" width="820" height="150" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="448" class="lhead">③ surface 重建（可替换投影）：喂给模型的最小上下文窗口</text>
+  <text x="60" y="470" class="lsub">压缩 = 一次局部替换：中间历史段被摘要顶替，稳定段原样进入新窗口</text>
+
+  <g transform="translate(60,482)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">system 原样保留</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">执行现场第 0 条</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">永不被压缩吃掉</text>
+  </g>
+  <g transform="translate(326,482)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">[SUMMARY]: …</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">替换中间历史段</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">窗口立刻变小</text>
+  </g>
+  <g transform="translate(592,482)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">尾部 retain_tail 保留</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">最近执行现场不动</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">长结果已移出窗口</text>
+  </g>
+
+  <line x1="450" y1="572" x2="450" y2="606" stroke="#555" stroke-width="2" marker-end="url(#arr16)"/>
+  <text x="470" y="596" class="edge">到此为止 —— 三条不变量保证省 token 与不丢历史同时成立</text>
+
+  <!-- Layer 4: 不变量 -->
+  <rect x="40" y="608" width="820" height="112" rx="10" fill="#b26b24" class="layer"/>
+  <text x="60" y="634" class="lhead">④ 关键不变量</text>
+
+  <g transform="translate(60,650)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✗ 原始事件永不删除</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">append-only 真相源</text>
+  </g>
+  <g transform="translate(326,650)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✓ 压缩只换投影</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">历史始终可回溯</text>
+  </g>
+  <g transform="translate(592,650)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✓ 每 scope 独立 Session</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">压 A 不影响 B 的窗口</text>
+  </g>
+
+  <text x="30" y="742" class="note">核心：窗口变小是省 token，真相不变是保正确 —— 压缩在 surface 上做局部替换，events 里的原始历史一个字节都不删。</text>
+</svg>

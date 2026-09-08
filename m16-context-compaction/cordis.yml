@@ -1,0 +1,23 @@
+# Cordis 应用配置（与 m09~m12 同风格，m13 起未再出现，m16 重新引入）
+# 课程演示用；框架 runtime 读取此配置决定加载哪些插件 / 服务以及压缩策略阈值。
+plugins:
+  agent-loop:
+    enabled: true
+  session-event-sourced:
+    enabled: true
+  compaction-basic:
+    enabled: true
+    # 选用哪个 CompactionEngine 实现（可替换策略；真实工程每个 context 加载一个）
+    #   basic       → CompactionBasic（保留 system + 尾部 N 条，经典策略）
+    #   keep-recent → CompactionKeepRecent（仅保留最近 N 条，激进策略）
+    strategy: basic
+    # 压缩策略（对应真实工程 dsh-compaction-basic 的保留/触发配置）
+    options:
+      # 触发压力阈值（UTF-8 字节，教学估算；生产用 tokenizer）
+      pressure_limit_bytes: 600
+      # 工具结果剪枝阈值（超过该字节数的 tool/result 在送摘要前被裁掉中部）
+      tool_result_prune_bytes: 320
+      # 摘要保留最近尾部的条数（basic 策略的 stable-range 尾部长度）
+      retain_tail: 1
+      # keep-recent 策略保留的「最近事件」条数
+      keep_recent: 3
