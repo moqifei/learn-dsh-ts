@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="460" viewBox="0 0 900 460" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="460" fill="#fafafa"/>
+  <defs>
+    <marker id="arr15b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .colh  { font-size: 15px; font-weight: 700; fill: #fff; }
+      .box   { rx: 8; }
+      .lbl   { font-size: 12px; fill: #333; }
+      .sub   { font-size: 11px; fill: #666; }
+      .note  { font-size: 12px; fill: #444; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m15 · 对比：课程简化版 vs deepseek-harness 真实工程</text>
+
+  <!-- Left: 简化版 -->
+  <rect x="40" y="60" width="400" height="340" rx="10" fill="#8a8a8a" class="box"/>
+  <text x="240" y="86" text-anchor="middle" class="colh">本课程简化版（聚焦主线）</text>
+
+  <rect x="70" y="106" width="340" height="86" rx="6" fill="#ffffff" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="130" text-anchor="middle" class="lbl">FileSystemSkills</text>
+  <text x="240" y="150" text-anchor="middle" class="sub">catalog() 读 frontmatter → SkillSummary[]</text>
+  <text x="240" y="168" text-anchor="middle" class="sub">load(name) 读完整 SKILL.md → Skill</text>
+  <text x="240" y="184" text-anchor="middle" class="sub">手写最小 key: value 解析（无 js-yaml）</text>
+
+  <line x1="240" y1="192" x2="240" y2="216" stroke="#555" stroke-width="2" marker-end="url(#arr15b)"/>
+  <rect x="70" y="218" width="340" height="50" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="242" text-anchor="middle" class="lbl">SkillService 全局单例</text>
+  <text x="240" y="260" text-anchor="middle" class="sub">loadedByScope 手写 Map 分桶</text>
+
+  <rect x="70" y="280" width="340" height="88" rx="6" fill="#e9e9e9" stroke="#ccc" stroke-width="1.2"/>
+  <text x="240" y="304" text-anchor="middle" class="lbl">刻意剥掉的工程外壳</text>
+  <text x="240" y="324" text-anchor="middle" class="sub">仅本地 node:fs 单一来源</text>
+  <text x="240" y="342" text-anchor="middle" class="sub">校验失败直接抛错（教学可见）</text>
+  <text x="240" y="360" text-anchor="middle" class="sub">复用 m13 createScope，未接 ScopeLayer</text>
+
+  <!-- Right: 真实工程 -->
+  <rect x="460" y="60" width="400" height="340" rx="10" fill="#7b4f9e" class="box"/>
+  <text x="660" y="86" text-anchor="middle" class="colh">deepseek-harness packages/skill</text>
+
+  <rect x="490" y="106" width="340" height="86" rx="6" fill="#ffffff" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="130" text-anchor="middle" class="lbl">skill-filesystem · parseSkillFile()</text>
+  <text x="660" y="150" text-anchor="middle" class="sub">js-yaml 严格解析 frontmatter</text>
+  <text x="660" y="168" text-anchor="middle" class="sub">校验 name / description / whenToUse</text>
+  <text x="660" y="184" text-anchor="middle" class="sub">解析失败仅 warn 并跳过（容错）</text>
+
+  <line x1="660" y1="192" x2="660" y2="216" stroke="#fff" stroke-width="2" marker-end="url(#arr15b)"/>
+  <rect x="490" y="218" width="340" height="50" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="242" text-anchor="middle" class="lbl">SkillService + SkillRuntime</text>
+  <text x="660" y="260" text-anchor="middle" class="sub">已加载 body 暴露给工具 + invocation 策略</text>
+
+  <rect x="490" y="280" width="340" height="88" rx="6" fill="#f3e9fa" stroke="#b98fd6" stroke-width="1.2"/>
+  <text x="660" y="304" text-anchor="middle" class="lbl">生产级完备度</text>
+  <text x="660" y="324" text-anchor="middle" class="sub">FileSystem + Context.fs 多 provider</text>
+  <text x="660" y="342" text-anchor="middle" class="sub">AbortSignal 取消 / 缺目录容错</text>
+  <text x="660" y="360" text-anchor="middle" class="sub">与 agent loop、ScopeLayer 深度集成</text>
+
+  <text x="30" y="430" class="note">两边核心三件事完全一致：catalog 摘要 → 按需 load 正文 → 按作用域隔离缓存；差异只在多 provider、完整 YAML、生产容错这些工程外壳。</text>
+</svg>

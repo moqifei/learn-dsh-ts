@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="760" viewBox="0 0 900 760" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="760" fill="#fafafa"/>
+  <defs>
+    <marker id="arr15c" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m15 · 实验 6 热替换：失效即时 + 惰性重建（进程不重启）</text>
+
+  <!-- Layer 1: 触发器 -->
+  <rect x="40" y="60" width="820" height="130" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① 触发器：fs.watch —— 只负责"发现变化"，不做任何重读</text>
+  <text x="60" y="108" class="lsub">watch(rootPath, { recursive: true })，回调里只判断文件名含 SKILL.md 就调 invalidate() —— 这就是 agent 进程不用重启的原因</text>
+
+  <g transform="translate(60,122)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">运营编辑 SKILL.md</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">writeFileSync 写新版本（v2）</text>
+  </g>
+  <g transform="translate(326,122)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">fs.watch 回调触发</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">异步，需 await delay 等防抖</text>
+  </g>
+  <g transform="translate(592,122)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">进程此时仍存活</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">尚未触碰任何内存缓存</text>
+  </g>
+
+  <line x1="450" y1="190" x2="450" y2="224" stroke="#555" stroke-width="2" marker-end="url(#arr15c)"/>
+  <text x="470" y="214" class="edge">→ 调用 invalidate()，进入失效阶段</text>
+
+  <!-- Layer 2: 失效 -->
+  <rect x="40" y="226" width="820" height="140" rx="10" fill="#b26b24" class="layer"/>
+  <text x="60" y="252" class="lhead">② 失效 invalidate()：即时、三件事，一件都不碰磁盘</text>
+  <text x="60" y="274" class="lsub">废止通知是即时的：缓存立刻作废、事件立刻广播；但没有人立刻重读磁盘</text>
+
+  <g transform="translate(60,286)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">revision += 1</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">乐观并发版本号</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">真实工程用它防撕裂</text>
+  </g>
+  <g transform="translate(326,286)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">loadedByScope.clear()</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">已加载正文缓存作废</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">下次 load 无法命中旧值</text>
+  </g>
+  <g transform="translate(592,286)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">emit('skills/change')</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">广播失效事件</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">订阅方可标记快照作废</text>
+  </g>
+
+  <line x1="450" y1="366" x2="450" y2="400" stroke="#555" stroke-width="2" marker-end="url(#arr15c)"/>
+  <text x="470" y="390" class="edge">磁盘仍未重读 —— 新正文要等下一次 load</text>
+
+  <!-- Layer 3: 惰性重建 -->
+  <rect x="40" y="402" width="820" height="140" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="428" class="lhead">③ 重建是惰性的：下一次 load 才回源磁盘</text>
+  <text x="60" y="450" class="lsub">正在进行的请求继续用它 load 时的快照（旧知识），新 load 才拿到新版本 —— 没有请求会看到"半截改动"</text>
+
+  <g transform="translate(60,462)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">下次 load(key, name)</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">缓存已空 → 被迫回源</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">FileSystemSkills.load()</text>
+  </g>
+  <g transform="translate(326,462)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">重新 readFileSync</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">读到磁盘上的新版本 v2</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">写回 loadedByScope[key]</text>
+  </g>
+  <g transform="translate(592,462)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">进程从头到尾没重启</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">watch 来源可换 Context.fs</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">也可换远程 registry 推送</text>
+  </g>
+
+  <line x1="450" y1="542" x2="450" y2="576" stroke="#555" stroke-width="2" marker-end="url(#arr15c)"/>
+  <text x="470" y="566" class="edge">为什么不用更简单粗暴的"热推送"？</text>
+
+  <!-- Layer 4: 为什么不是热推送 -->
+  <rect x="40" y="578" width="820" height="142" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="604" class="lhead">④ 为什么不是「热推送」：撕裂状态 vs 版本快照</text>
+  <text x="60" y="626" class="lsub">热推送 = 文件一改立刻覆盖所有缓存；一个正在用旧版的请求，可能执行到一半读到被覆盖一半的内容</text>
+
+  <g transform="translate(60,638)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✗ 热推送的风险</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">请求中途看到半截改动</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">（撕裂状态）</text>
+  </g>
+  <g transform="translate(326,638)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✓ 版本号 + 快照</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">每次请求锁在开始时的版本</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">既热替换、又安全</text>
+  </g>
+  <g transform="translate(592,638)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">代价可接受</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">最多延迟一个 load 周期生效</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">对 Agent 场景完全够用</text>
+  </g>
+
+  <text x="30" y="742" class="note">核心：热替换解决的是"何时让旧内容作废、何时让新内容生效"的时机解耦——废弃是主动即时的，重建是被动按需的，二者解耦才既热又稳。</text>
+</svg>

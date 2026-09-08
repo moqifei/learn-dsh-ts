@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="760" viewBox="0 0 900 760" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="760" fill="#fafafa"/>
+  <defs>
+    <marker id="arr15" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .layer { rx: 10; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .note  { font-size: 12px; fill: #444; }
+      .edge  { font-size: 12px; fill: #555; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m15 · 按需加载 Skill：catalog 与 load 的两段式</text>
+
+  <!-- Layer 1: 磁盘 -->
+  <rect x="40" y="60" width="820" height="140" rx="10" fill="#3a6ea5" class="layer"/>
+  <text x="60" y="86" class="lhead">① 磁盘 skills/ 目录：每个技能一个 SKILL.md（frontmatter + body）</text>
+  <text x="60" y="108" class="lsub">正文（body）始终留在磁盘 —— catalog 与 load 的成本分离，从文件布局开始</text>
+
+  <g transform="translate(60,124)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">incident-triage/</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">SKILL.md</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">frontmatter + body</text>
+  </g>
+  <g transform="translate(326,124)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">release-notes/</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">SKILL.md</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">frontmatter + body</text>
+  </g>
+  <g transform="translate(592,124)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#2e5984"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">… 任意新技能</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">放一个目录即接入</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">无需改运行时代码</text>
+  </g>
+
+  <line x1="450" y1="200" x2="450" y2="234" stroke="#555" stroke-width="2" marker-end="url(#arr15)"/>
+  <text x="470" y="224" class="edge">catalog 路径：只扫头部，很便宜</text>
+
+  <!-- Layer 2: catalog -->
+  <rect x="40" y="236" width="820" height="150" rx="10" fill="#7b4f9e" class="layer"/>
+  <text x="60" y="262" class="lhead">② catalog 阶段（便宜）：只解析 frontmatter，产出摘要</text>
+  <text x="60" y="284" class="lsub">每个技能只读一次头部：name + description；正文一个字节都不碰</text>
+  <text x="60" y="304" class="lsub">SkillSummary 类型上根本没有 body 字段 —— 目录开销与正文开销从类型上隔离</text>
+
+  <g transform="translate(60,312)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">扫描 &lt;root&gt;/&lt;name&gt;/SKILL.md</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">只解析 YAML frontmatter</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">不 readFileSync 正文</text>
+  </g>
+  <g transform="translate(326,312)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">产出 SkillSummary[]</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">{ name, description }</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">常驻系统提示词，很小</text>
+  </g>
+  <g transform="translate(592,312)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#5c3a78"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">body 字段不存在</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">不是"没返回"，是类型上没有</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">→ 想泄漏也泄漏不出去</text>
+  </g>
+
+  <line x1="450" y1="386" x2="450" y2="420" stroke="#555" stroke-width="2" marker-end="url(#arr15)"/>
+  <text x="470" y="410" class="edge">模型判断任务匹配某个技能 → 才走下面的 load 路径</text>
+
+  <!-- Layer 3: load -->
+  <rect x="40" y="422" width="820" height="150" rx="10" fill="#4f8a4f" class="layer"/>
+  <text x="60" y="448" class="lhead">③ load 阶段（按需、贵）：正文才被读进指定作用域</text>
+  <text x="60" y="470" class="lsub">load(key, name) 必须显式传 scopeKey —— 全局单例无法推断"当前是哪个 agent"，隔离边界就卡在这里</text>
+
+  <g transform="translate(60,482)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">load_skill(key, name)</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">模型（或调用方）按需触发</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">未选中 → 永远不走这里</text>
+  </g>
+  <g transform="translate(326,482)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">readFileSync 读正文</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">完整 SKILL.md 解析为 Skill</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">{ name, description, body }</text>
+  </g>
+  <g transform="translate(592,482)">
+    <rect x="0" y="0" width="246" height="62" rx="6" fill="#3d6b3d"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">写入 loadedByScope[key]</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">按 scopeKey 分桶缓存</text>
+    <text x="123" y="54" text-anchor="middle" class="csub">该作用域内正文可见</text>
+  </g>
+
+  <line x1="450" y1="572" x2="450" y2="606" stroke="#555" stroke-width="2" marker-end="url(#arr15)"/>
+  <text x="470" y="596" class="edge">到此为止 —— 三条不变量保证成本与隔离</text>
+
+  <!-- Layer 4: 不变量 -->
+  <rect x="40" y="608" width="820" height="112" rx="10" fill="#b26b24" class="layer"/>
+  <text x="60" y="634" class="lhead">④ 关键不变量</text>
+
+  <g transform="translate(60,650)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✗ 未加载永不上下文</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">正文只留在磁盘</text>
+  </g>
+  <g transform="translate(326,650)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✓ 按作用域隔离</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">A 加载的正文，B 取不到</text>
+  </g>
+  <g transform="translate(592,650)">
+    <rect x="0" y="0" width="246" height="56" rx="6" fill="#8a5a1e"/>
+    <text x="123" y="20" text-anchor="middle" class="cname">✓ dispose 即回收</text>
+    <text x="123" y="40" text-anchor="middle" class="csub">随 scope/disposed 清空该桶</text>
+  </g>
+
+  <text x="30" y="742" class="note">核心：catalog 与 load 把"知道有哪些"与"知道具体内容"拆开——目录常驻、正文按需，上下文成本只花在模型选中的技能上。</text>
+</svg>
