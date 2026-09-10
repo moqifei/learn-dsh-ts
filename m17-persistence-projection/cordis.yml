@@ -1,0 +1,15 @@
+# Cordis 应用配置（m13 起未再出现，m16/m17 恢复）
+# 演示"配置驱动"：持久化后端与投影策略来自配置文件，而非硬编码。
+plugins:
+  session-persistence:
+    enabled: true
+    # 持久化后端（对应真实工程 session-persistence-jsonl 等可替换 provider）
+    #   jsonl → JsonlPersistence（每行一个事件，进程退出不丢）
+    backend: jsonl
+    # JSONL 文件路径（课程用临时目录，这里给相对名）
+    file: session.jsonl
+  session-projection:
+    enabled: true
+    # 投影缓存的强制落盘间隔（对应真实工程 writeEveryEvents / writeIntervalMs）
+    write_every_events: 3
+    write_interval_ms: 1000

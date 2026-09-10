@@ -1,0 +1,18 @@
+# m18 · 后台 Job 与 Terminal —— 配置驱动载体
+#
+# 两个 entry：
+# - `./jobs.ts`：Jobs 服务（注册 ctx.jobs 单例），本课"身份 + 生命周期"的拥有者；
+#   配置 defaultOwner / maxConcurrent 通过 entry 的 `config` 字段注入构造。
+# - `./runner.ts`：主插件（Consumer + 装配），通过 inject:['jobs'] 拿到 Jobs 服务，
+#   再用 await ctx.plugin 加载两个"producer 能力"插件——这正是"一切皆为插件"：
+#   连"能跑什么类型的后台任务"也是插件贡献的，而非写死在 Jobs 里。
+#
+# 配置参数：
+# - defaultOwner：默认任务归属者（真实工程里是 agent/harness 的 owner id）
+# - maxConcurrent：同一归属者允许的最大并发后台任务数
+
+- name: './jobs.ts'
+  config:
+    defaultOwner: harness
+    maxConcurrent: 8
+- name: './runner.ts'

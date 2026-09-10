@@ -1,0 +1,13 @@
+{
+  "name": "m17-persistence-projection",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx runner.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "*"
+  }
+}

@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="700" fill="#fafafa"/>
+  <defs>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+      .edge  { font-size: 12px; fill: #555; }
+      .note  { font-size: 11px; fill: #888; }
+      .warn  { font-size: 12px; fill: #c0504d; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m17 · 持久化与投影：事件落盘 + 派生视图缓存</text>
+
+  <!-- Layer 1: events 真相源 -->
+  <rect x="30" y="56" width="840" height="130" rx="10" fill="#3a6ea5"/>
+  <text x="50" y="82" class="lhead">① Session.events（append-only · 唯一真相源）</text>
+  <text x="50" y="102" class="lsub">Session 只持有事件日志，不持有可变的"消息数组"或"统计对象"——派生结果随用随算，不进存储</text>
+
+  <g transform="translate(50,114)">
+    <rect x="0" y="0" width="128" height="56" rx="6" fill="#2e5984"/>
+    <text x="64" y="20" text-anchor="middle" class="cname">seq 0</text>
+    <text x="64" y="38" text-anchor="middle" class="csub">session/title</text>
+  </g>
+  <g transform="translate(188,114)">
+    <rect x="0" y="0" width="128" height="56" rx="6" fill="#2e5984"/>
+    <text x="64" y="20" text-anchor="middle" class="cname">seq 1</text>
+    <text x="64" y="38" text-anchor="middle" class="csub">user/message</text>
+  </g>
+  <g transform="translate(326,114)">
+    <rect x="0" y="0" width="128" height="56" rx="6" fill="#2e5984"/>
+    <text x="64" y="20" text-anchor="middle" class="cname">seq 2</text>
+    <text x="64" y="38" text-anchor="middle" class="csub">assistant/message</text>
+  </g>
+  <g transform="translate(464,114)">
+    <rect x="0" y="0" width="128" height="56" rx="6" fill="#2e5984"/>
+    <text x="64" y="20" text-anchor="middle" class="cname">seq 3</text>
+    <text x="64" y="38" text-anchor="middle" class="csub">tool/result</text>
+  </g>
+  <g transform="translate(602,114)">
+    <rect x="0" y="0" width="248" height="56" rx="6" fill="#2e5984"/>
+    <text x="124" y="20" text-anchor="middle" class="cname">seq N … 只追加，永不删改</text>
+    <text x="124" y="38" text-anchor="middle" class="csub">日志完整性 = 投影正确性的前提</text>
+  </g>
+
+  <line x1="450" y1="186" x2="450" y2="216" stroke="#555" stroke-width="2" marker-end="url(#arrP)"/>
+  <text x="468" y="208" class="edge">append（observe 订阅"已接受"事件）</text>
+
+  <!-- Layer 2: 持久化三段式 -->
+  <rect x="30" y="218" width="840" height="190" rx="10" fill="#7b4f9e"/>
+  <text x="50" y="244" class="lhead">② 持久化三段式：Definition / Provider / Consumer</text>
+  <text x="50" y="264" class="lsub">Session 只依赖 Persistence 接口（append / load / close）；后端可插拔，由 cordis.yml 的 backend: jsonl | memory 决定</text>
+
+  <g transform="translate(50,276)">
+    <rect x="0" y="0" width="253" height="112" rx="6" fill="#5c3a78"/>
+    <text x="126" y="22" text-anchor="middle" class="cname">Definition · Persistence 接口</text>
+    <text x="126" y="44" text-anchor="middle" class="csub">append(event) / load() / close()</text>
+    <text x="126" y="62" text-anchor="middle" class="csub">Session 不依赖任何具体存储</text>
+    <text x="126" y="86" text-anchor="middle" class="csub">换后端 = 换注入对象</text>
+    <text x="126" y="102" text-anchor="middle" class="csub">Session 代码零改动</text>
+  </g>
+  <g transform="translate(323,276)">
+    <rect x="0" y="0" width="253" height="112" rx="6" fill="#5c3a78"/>
+    <text x="126" y="22" text-anchor="middle" class="cname">Provider · JSONL / Memory 后端</text>
+    <text x="126" y="44" text-anchor="middle" class="csub">JSONL：一行一事件，追加不重写</text>
+    <text x="126" y="62" text-anchor="middle" class="csub">进程退出不丢，跨重启保留</text>
+    <text x="126" y="86" text-anchor="middle" class="csub">Memory：数组存事件</text>
+    <text x="126" y="102" text-anchor="middle" class="csub">零磁盘，测试/演示用</text>
+  </g>
+  <g transform="translate(596,276)">
+    <rect x="0" y="0" width="253" height="112" rx="6" fill="#5c3a78"/>
+    <text x="126" y="22" text-anchor="middle" class="cname">Consumer · PersistenceCoordinator</text>
+    <text x="126" y="44" text-anchor="middle" class="csub">session.observe → provider.append</text>
+    <text x="126" y="62" text-anchor="middle" class="csub">观察的是"完整事实"，非派生视图</text>
+    <text x="126" y="86" text-anchor="middle" class="csub">checkpoint = nextSeq - 1</text>
+    <text x="126" y="102" text-anchor="middle" class="csub">已落盘水位，不是快照</text>
+  </g>
+
+  <line x1="450" y1="408" x2="450" y2="438" stroke="#555" stroke-width="2" marker-end="url(#arrP)"/>
+  <text x="468" y="430" class="edge">load() → hydrate()：校验 seq 连续 + schema，坏数据显式拒绝</text>
+
+  <!-- Layer 3: 投影 -->
+  <rect x="30" y="440" width="840" height="180" rx="10" fill="#2f6f59"/>
+  <text x="50" y="466" class="lhead">③ 投影（纯折叠）：同一份日志派生多种视图，缓存可丢弃、可重算</text>
+  <text x="50" y="486" class="lsub">fold 是纯函数式折叠：事件进、状态出；watermark 记录已处理最大 seq，缺中间一行立即抛 sequence gap</text>
+
+  <g transform="translate(50,498)">
+    <rect x="0" y="0" width="193" height="100" rx="6" fill="#265c49"/>
+    <text x="96" y="22" text-anchor="middle" class="cname">transcript</text>
+    <text x="96" y="44" text-anchor="middle" class="csub">聊天消息列表</text>
+    <text x="96" y="62" text-anchor="middle" class="csub">= m08 的 deriveMessages</text>
+    <text x="96" y="86" text-anchor="middle" class="csub">喂给模型的视图</text>
+  </g>
+  <g transform="translate(253,498)">
+    <rect x="0" y="0" width="193" height="100" rx="6" fill="#265c49"/>
+    <text x="96" y="22" text-anchor="middle" class="cname">title</text>
+    <text x="96" y="44" text-anchor="middle" class="csub">会话标题</text>
+    <text x="96" y="62" text-anchor="middle" class="csub">最新一条 session/title</text>
+    <text x="96" y="86" text-anchor="middle" class="csub">latestTitle</text>
+  </g>
+  <g transform="translate(456,498)">
+    <rect x="0" y="0" width="193" height="100" rx="6" fill="#265c49"/>
+    <text x="96" y="22" text-anchor="middle" class="cname">stats</text>
+    <text x="96" y="44" text-anchor="middle" class="csub">过程统计</text>
+    <text x="96" y="62" text-anchor="middle" class="csub">toolCount 等</text>
+    <text x="96" y="86" text-anchor="middle" class="csub">派生值，不进存储</text>
+  </g>
+  <g transform="translate(659,498)">
+    <rect x="0" y="0" width="191" height="100" rx="6" fill="#265c49"/>
+    <text x="95" y="22" text-anchor="middle" class="cname">watermark</text>
+    <text x="95" y="44" text-anchor="middle" class="csub">已处理最大 seq</text>
+    <text x="95" y="62" text-anchor="middle" class="csub">重复 fold 幂等不变</text>
+    <text x="95" y="86" text-anchor="middle" class="csub">缺行抛 sequence gap</text>
+  </g>
+
+  <text x="450" y="648" text-anchor="middle" class="warn">崩溃后：replay 日志 → hydrate 重建 events → 重新 fold —— 投影缓存丢了不算丢，日志在，一切都在</text>
+  <text x="30" y="682" class="note">核心闭环：事件 append → 持久化后端落盘（checkpoint 可省）→ 投影从日志折叠派生；崩溃后 replay 日志即可重建全部状态。</text>
+</svg>

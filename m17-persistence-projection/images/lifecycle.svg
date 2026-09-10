@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="700" fill="#fafafa"/>
+  <defs>
+    <marker id="arrL" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <marker id="arrR" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#c0504d"/>
+    </marker>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 14px; font-weight: 700; fill: #fff; }
+      .lsub  { font-size: 11px; fill: #e8eef5; }
+      .cname { font-size: 11px; fill: #fff; font-weight: 700; }
+      .csub  { font-size: 10px; fill: #eef3f8; }
+      .kname { font-size: 12px; font-weight: 700; fill: #1a1a2e; }
+      .ksub  { font-size: 11px; fill: #555; }
+      .edge  { font-size: 11px; fill: #555; }
+      .note  { font-size: 11px; fill: #888; }
+      .warn  { font-size: 12px; fill: #c0504d; font-weight: 700; }
+    </style>
+  </defs>
+
+  <text x="30" y="34" class="title">m17 · 生命周期：运行 → 落盘 → 冷加载 → 投影</text>
+
+  <!-- Layer 1: 五阶段 -->
+  <rect x="30" y="56" width="840" height="190" rx="10" fill="#3a6ea5"/>
+  <text x="50" y="82" class="lhead">① 生命周期五阶段：内存态会消失，磁盘上的日志不会</text>
+  <text x="50" y="102" class="lsub">writeEveryEvents / writeIntervalMs 来自 cordis.yml（配置驱动）；关闭时移除 observer 并关闭 provider</text>
+
+  <g transform="translate(50,116)">
+    <rect x="0" y="0" width="150" height="112" rx="6" fill="#2e5984"/>
+    <text x="75" y="22" text-anchor="middle" class="cname">① 运行中</text>
+    <text x="75" y="44" text-anchor="middle" class="csub">内存 Session.events</text>
+    <text x="75" y="62" text-anchor="middle" class="csub">append 事件</text>
+    <text x="75" y="86" text-anchor="middle" class="csub">投影缓存 = 全量 fold</text>
+    <text x="75" y="102" text-anchor="middle" class="csub">随时可丢弃重算</text>
+  </g>
+  <g transform="translate(212,116)">
+    <rect x="0" y="0" width="150" height="112" rx="6" fill="#2e5984"/>
+    <text x="75" y="22" text-anchor="middle" class="cname">② 落盘</text>
+    <text x="75" y="44" text-anchor="middle" class="csub">PersistenceCoordinator</text>
+    <text x="75" y="62" text-anchor="middle" class="csub">observe → JSONL append</text>
+    <text x="75" y="86" text-anchor="middle" class="csub">一行一事件，含 seq</text>
+    <text x="75" y="102" text-anchor="middle" class="csub">追加不重写旧行</text>
+  </g>
+  <g transform="translate(374,116)">
+    <rect x="0" y="0" width="150" height="112" rx="6" fill="#2e5984"/>
+    <text x="75" y="22" text-anchor="middle" class="cname">③ 关闭</text>
+    <text x="75" y="44" text-anchor="middle" class="csub">进程退出</text>
+    <text x="75" y="62" text-anchor="middle" class="csub">内存日志丢弃</text>
+    <text x="75" y="86" text-anchor="middle" class="csub">磁盘日志保留</text>
+    <text x="75" y="102" text-anchor="middle" class="csub">checkpoint = 最高 seq</text>
+  </g>
+  <g transform="translate(536,116)">
+    <rect x="0" y="0" width="150" height="112" rx="6" fill="#2e5984"/>
+    <text x="75" y="22" text-anchor="middle" class="cname">④ 冷加载 replay</text>
+    <text x="75" y="44" text-anchor="middle" class="csub">逐行读 JSONL</text>
+    <text x="75" y="62" text-anchor="middle" class="csub">校验 seq 连续 + schema</text>
+    <text x="75" y="86" text-anchor="middle" class="csub">hydrate 重建 events</text>
+    <text x="75" y="102" text-anchor="middle" class="csub">不猜测、不静默跳过</text>
+  </g>
+  <g transform="translate(698,116)">
+    <rect x="0" y="0" width="152" height="112" rx="6" fill="#2e5984"/>
+    <text x="76" y="22" text-anchor="middle" class="cname">⑤ 投影 fold</text>
+    <text x="76" y="44" text-anchor="middle" class="csub">transcript / title</text>
+    <text x="76" y="62" text-anchor="middle" class="csub">stats / watermark</text>
+    <text x="76" y="86" text-anchor="middle" class="csub">崩溃前 == 崩溃后</text>
+    <text x="76" y="102" text-anchor="middle" class="csub">逐字节一致</text>
+  </g>
+
+
+  <!-- Layer 2: 拒绝路径 -->
+  <rect x="30" y="266" width="840" height="150" rx="10" fill="#c0504d"/>
+  <text x="50" y="292" class="lhead">② 冷加载的拒绝路径：坏数据必须显式失败，恢复绝不猜测</text>
+  <text x="50" y="312" class="lsub">日志文件被截断、被手工改坏、跨版本写入，都会走到这里——宁可拒绝加载，也不静默吞掉一条事件</text>
+
+  <g transform="translate(50,326)">
+    <rect x="0" y="0" width="400" height="66" rx="6" fill="#a33f3c"/>
+    <text x="200" y="24" text-anchor="middle" class="cname">拒绝 A：seq 缺口（non-contiguous）</text>
+    <text x="200" y="46" text-anchor="middle" class="csub">行 0,1,3（缺 2）→ hydrate 抛错 · 投影 fold 抛 sequence gap</text>
+  </g>
+  <g transform="translate(470,326)">
+    <rect x="0" y="0" width="380" height="66" rx="6" fill="#a33f3c"/>
+    <text x="190" y="24" text-anchor="middle" class="cname">拒绝 B：坏 schema（unsupported schema）</text>
+    <text x="190" y="46" text-anchor="middle" class="csub">缺 type / seq 或 schema 版本不符 → 拒绝加载损坏数据</text>
+  </g>
+
+  <line x1="450" y1="246" x2="450" y2="264" stroke="#c0504d" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- Layer 3: 可插拔后端 -->
+  <rect x="30" y="436" width="840" height="150" rx="10" fill="none" stroke="#3a6ea5" stroke-width="2"/>
+  <text x="50" y="462" class="kname">③ 可插拔后端：同一份 Session 接口，JSONL / Memory 互换</text>
+
+  <g transform="translate(50,478)">
+    <rect x="0" y="0" width="390" height="88" rx="6" fill="#eef3f8" stroke="#3a6ea5"/>
+    <text x="195" y="24" text-anchor="middle" class="kname">JsonlPersistence</text>
+    <text x="195" y="46" text-anchor="middle" class="ksub">持久化到磁盘 session.jsonl，跨进程重启保留</text>
+    <text x="195" y="68" text-anchor="middle" class="ksub">append → appendFileSync 一行 · load → 逐行 parse</text>
+  </g>
+  <g transform="translate(460,478)">
+    <rect x="0" y="0" width="390" height="88" rx="6" fill="#eef3f8" stroke="#3a6ea5"/>
+    <text x="195" y="24" text-anchor="middle" class="kname">MemoryPersistence</text>
+    <text x="195" y="46" text-anchor="middle" class="ksub">仅内存（测试 / 演示），崩溃即丢</text>
+    <text x="195" y="68" text-anchor="middle" class="ksub">派生视图与 JSONL 完全一致（实验 5 断言）</text>
+  </g>
+
+  <text x="450" y="620" text-anchor="middle" class="warn">实验 1-5：写盘/重放一致 · checkpoint 水位 · 投影 fold 幂等 + sequence gap · 冷加载拒绝损坏数据 · 多后端等价</text>
+  <text x="30" y="660" class="note">一句话：落盘保的是事实（可回放、可审计），折叠出的是视图（可丢弃、可重算）—— 存储只需变薄，正确性反而更硬。</text>
+</svg>

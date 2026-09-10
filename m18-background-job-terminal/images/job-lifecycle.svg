@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="560" fill="#fafafa"/>
+  <defs>
+    <marker id="arrL" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <marker id="arrK" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#c0504d"/>
+    </marker>
+    <marker id="arrC" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#059669"/>
+    </marker>
+    <marker id="arrF" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .st    { font-size: 15px; font-weight: 700; }
+      .stsub { font-size: 10.5px; fill: #555; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .lbl   { font-size: 10.5px; fill: #555; }
+      .note  { font-size: 11px; fill: #555; }
+      .key   { font-size: 11px; fill: #c0504d; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m18 · Job 生命周期、事件流与归属鉴权</text>
+
+  <!-- ============ 状态机 ============ -->
+  <g>
+    <rect x="24" y="56" width="140" height="60" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="94" y="80" text-anchor="middle" class="st" fill="#1e3a8a">running</text>
+    <text x="94" y="100" text-anchor="middle" class="stsub">start() 登记即进入</text>
+  </g>
+  <g>
+    <rect x="264" y="56" width="140" height="60" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="334" y="80" text-anchor="middle" class="st" fill="#92400e">stopping</text>
+    <text x="334" y="100" text-anchor="middle" class="stsub">stop() 只置此态</text>
+  </g>
+  <g>
+    <rect x="24" y="196" width="140" height="60" rx="10" fill="#fee2e2" stroke="#c0504d" stroke-width="2"/>
+    <text x="94" y="220" text-anchor="middle" class="st" fill="#991b1b">killed</text>
+    <text x="94" y="240" text-anchor="middle" class="stsub">被信号中断</text>
+  </g>
+  <g>
+    <rect x="264" y="196" width="140" height="60" rx="10" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+    <text x="334" y="220" text-anchor="middle" class="st" fill="#166534">completed</text>
+    <text x="334" y="240" text-anchor="middle" class="stsub">exit = 0</text>
+  </g>
+  <g>
+    <rect x="504" y="196" width="140" height="60" rx="10" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="574" y="220" text-anchor="middle" class="st" fill="#6b21a8">failed</text>
+    <text x="574" y="240" text-anchor="middle" class="stsub">exit ≠ 0 / 启动即错</text>
+  </g>
+
+  <!-- 转移箭头 -->
+  <line x1="166" y1="86" x2="260" y2="86" stroke="#666" stroke-width="2" marker-end="url(#arrL)"/>
+  <text x="213" y="78" text-anchor="middle" class="lbl">stop(SIGTERM)</text>
+
+  <line x1="120" y1="118" x2="94" y2="192" stroke="#c0504d" stroke-width="2" marker-end="url(#arrK)"/>
+  <text x="128" y="164" text-anchor="middle" class="lbl" fill="#c0504d">exit(signal)</text>
+
+  <line x1="334" y1="118" x2="334" y2="192" stroke="#059669" stroke-width="2" marker-end="url(#arrC)"/>
+  <text x="384" y="164" text-anchor="middle" class="lbl" fill="#059669">exit = 0</text>
+
+  <line x1="400" y1="118" x2="560" y2="192" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="500" y="152" text-anchor="middle" class="lbl" fill="#7c3aed">exit ≠ 0</text>
+
+  <path d="M164,102 C 300,132 430,150 520,188" stroke="#7c3aed" stroke-width="2"
+        fill="none" stroke-dasharray="5 4" marker-end="url(#arrF)"/>
+
+  <text x="24" y="284" class="note">终态一律由 producer 的 exit handler <tspan font-weight="700">emit({ type: 'done' })</tspan> 回报；Jobs 不兜底置态，避免重复通知。</text>
+  <text x="24" y="304" class="note">启动即失败（虚线）：producer 抛错时 Jobs 直接把记录置 failed 并 <tspan font-weight="700">emit(done)</tspan>，不让 Consumer 拿到没有 handle 的 id。</text>
+  <text x="24" y="324" class="key">stop() 幂等：已终态直接返回；stopping 只代表"停止请求已发出"，它不是终态。</text>
+
+  <!-- ============ 事件流 ============ -->
+  <g>
+    <rect x="670" y="56" width="206" height="172" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+    <text x="773" y="80" text-anchor="middle" class="body" font-weight="700">jobs/event 事件流</text>
+    <text x="686" y="106" class="body">producer.emit(output)</text>
+    <text x="700" y="124" class="dim">→ 入 outbox（poll 取走即清空）</text>
+    <text x="686" y="148" class="body">producer.emit(status)</text>
+    <text x="700" y="166" class="dim">→ Jobs 推进状态机</text>
+    <text x="686" y="190" class="body">producer.emit(done)</text>
+    <text x="700" y="208" class="dim">→ 落终态 + finishedAt</text>
+  </g>
+  <text x="773" y="252" text-anchor="middle" class="body" font-weight="700">ctx.emit('jobs/event')</text>
+
+  <g>
+    <rect x="670" y="264" width="206" height="66" rx="10" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="773" y="288" text-anchor="middle" class="body" font-weight="700">Consumer 监听</text>
+    <text x="686" y="312" class="dim">实验 5：done 覆盖实验 1/2/3</text>
+  </g>
+
+  <!-- ============ 鉴权与并发 ============ -->
+  <text x="24" y="352" class="sect" font-size="14" font-weight="700" fill="#1a1a2e">归属鉴权与并发：不是"能不能跑"，而是"谁有权跑"</text>
+
+  <g>
+    <rect x="24" y="368" width="272" height="94" rx="8" fill="#ffffff" stroke="#c0504d"/>
+    <text x="40" y="392" class="body" font-weight="700">assertOwner(id, owner)</text>
+    <text x="40" y="414" class="dim">rec.owner !== owner → 拒绝</text>
+    <text x="40" y="432" class="dim">poll / stop / send 全走此校验</text>
+    <text x="40" y="452" class="key">实验 4：bob 停 alice 的任务被拒</text>
+  </g>
+  <g>
+    <rect x="314" y="368" width="272" height="94" rx="8" fill="#ffffff" stroke="#d97706"/>
+    <text x="330" y="392" class="body" font-weight="700">maxConcurrent（按 owner 限流）</text>
+    <text x="330" y="414" class="dim">ownedRunning(owner) ≥ 上限 → 拒绝</text>
+    <text x="330" y="432" class="dim">defaultOwner / maxConcurrent</text>
+    <text x="330" y="452" class="dim">均来自 cordis.yml 的 jobs entry</text>
+  </g>
+  <g>
+    <rect x="604" y="368" width="272" height="94" rx="8" fill="#ffffff" stroke="#2563eb"/>
+    <text x="620" y="392" class="body" font-weight="700">send(id, text)：仅持久会话</text>
+    <text x="620" y="414" class="dim">terminal 返回 SendCapableHandle</text>
+    <text x="620" y="432" class="dim">其它 kind 调用抛"不支持 send"</text>
+    <text x="620" y="452" class="dim">实验 2：变量跨命令保留</text>
+  </g>
+
+  <!-- ============ 结论 ============ -->
+  <rect x="24" y="478" width="852" height="66" rx="10" fill="#eef3f8" stroke="#3a6ea5" stroke-width="2"/>
+  <text x="44" y="504" class="body" font-weight="700">一句话：Jobs 只回答"谁在跑、跑到哪一步、归谁"；"怎么跑、跑在哪"永远归 Producer。</text>
+  <text x="44" y="526" class="dim">状态由 producer 回报、事件由 Jobs 转发、权限精确到 owner——新增一种执行方式，不必动任何一行 Jobs 代码。</text>
+</svg>

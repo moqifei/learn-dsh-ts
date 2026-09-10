@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="540" fill="#fafafa"/>
+  <defs>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 13px; font-weight: 700; fill: #fff; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .edge  { font-size: 10.5px; fill: #555; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .note  { font-size: 11px; fill: #555; }
+      .warn  { font-size: 11px; fill: #c0504d; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m18 · 后台 Job 与 Terminal — 三角色与"一切皆为插件"</text>
+
+  <!-- ============ 三角色 ============ -->
+  <!-- Consumer -->
+  <g>
+    <rect x="24" y="56" width="196" height="186" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M24,66 a10,10 0 0 1 10,-10 h176 a10,10 0 0 1 10,10 v24 h-196 z" fill="#2563eb"/>
+    <text x="122" y="78" text-anchor="middle" class="lhead">Consumer（runner）</text>
+    <text x="40" y="112" class="body">薄控制器 · kind 无关</text>
+    <text x="40" y="136" class="body">• start / list / poll</text>
+    <text x="52" y="156" class="body">stop / send 五个入口</text>
+    <text x="40" y="180" class="body">• 不知道内部怎么跑</text>
+    <text x="40" y="204" class="body">• 监听 jobs/event</text>
+    <text x="40" y="228" class="dim">（真实工程：job controller）</text>
+  </g>
+
+  <!-- Definition: Jobs -->
+  <g>
+    <rect x="316" y="56" width="224" height="186" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M316,66 a10,10 0 0 1 10,-10 h204 a10,10 0 0 1 10,10 v24 h-224 z" fill="#7c3aed"/>
+    <text x="428" y="78" text-anchor="middle" class="lhead">Definition · Jobs 服务</text>
+    <text x="332" y="112" class="body">ctx.jobs（Service 单例）</text>
+    <text x="332" y="136" class="body">• mint id = job_${++seq}</text>
+    <text x="332" y="156" class="body">• 状态机 + finishedAt</text>
+    <text x="332" y="176" class="body">• assertOwner 精确鉴权</text>
+    <text x="332" y="196" class="body">• maxConcurrent 限流</text>
+    <text x="332" y="216" class="body">• 零硬编码任何 kind</text>
+    <text x="332" y="236" class="dim">（身份先于执行：先登记再启动）</text>
+  </g>
+
+  <!-- Providers -->
+  <g>
+    <rect x="640" y="46" width="236" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,55 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v21 h-236 z" fill="#059669"/>
+    <text x="655" y="67" class="lhead">Producer · subprocess</text>
+    <text x="655" y="92" class="body">一次性命令：spawn → exit 即终态</text>
+  </g>
+  <g>
+    <rect x="640" y="116" width="236" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,125 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v21 h-236 z" fill="#d97706"/>
+    <text x="655" y="137" class="lhead">Producer · terminal</text>
+    <text x="655" y="162" class="body">持久会话：同一 shell，可多次 send</text>
+  </g>
+  <g>
+    <rect x="640" y="186" width="236" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,195 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v21 h-236 z" fill="#c0504d"/>
+    <text x="655" y="207" class="lhead">Producer · docker-runner</text>
+    <text x="655" y="232" class="body">演示可扩展：Jobs 一行未改</text>
+  </g>
+  <text x="758" y="262" text-anchor="middle" class="dim">每种 kind 都是一个独立插件</text>
+
+  <!-- 请求方向（上） -->
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="222" y1="118" x2="312" y2="118"/>
+    <line x1="542" y1="104" x2="636" y2="104"/>
+  </g>
+  <text x="267" y="110" text-anchor="middle" class="edge">请求：start 等入口</text>
+  <text x="589" y="96" text-anchor="middle" class="edge">producer.start()</text>
+
+  <!-- 回报方向（下） -->
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="312" y1="204" x2="222" y2="204"/>
+    <line x1="636" y1="212" x2="542" y2="212"/>
+  </g>
+  <text x="267" y="222" text-anchor="middle" class="edge">jobs/event 通知</text>
+  <text x="589" y="232" text-anchor="middle" class="edge">emit(3 类事件)</text>
+
+  <!-- ============ 插件即能力 ============ -->
+  <text x="24" y="288" class="sect">插件即能力：kind 是注入进来的，不是写死的</text>
+
+  <g>
+    <rect x="24" y="302" width="196" height="62" rx="8" fill="#eef3f8" stroke="#3a6ea5"/>
+    <text x="122" y="324" text-anchor="middle" class="body" font-weight="700">① 插件 apply(ctx)</text>
+    <text x="122" y="346" text-anchor="middle" class="dim">独立插件对象（有 name / apply）</text>
+  </g>
+  <g>
+    <rect x="240" y="302" width="216" height="62" rx="8" fill="#eef3f8" stroke="#3a6ea5"/>
+    <text x="348" y="324" text-anchor="middle" class="body" font-weight="700">② registerProducer(new Xxx())</text>
+    <text x="348" y="346" text-anchor="middle" class="dim">把自己的 kind 交给 Jobs</text>
+  </g>
+  <g>
+    <rect x="476" y="302" width="186" height="62" rx="8" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="569" y="324" text-anchor="middle" class="body" font-weight="700">③ kind 进入注册表</text>
+    <text x="569" y="346" text-anchor="middle" class="dim">jobs.start({kind}) 可跑通</text>
+  </g>
+  <g>
+    <rect x="682" y="302" width="194" height="62" rx="8" fill="#fee2e2" stroke="#c0504d"/>
+    <text x="779" y="324" text-anchor="middle" class="body" font-weight="700">④ 卸载 → disposer</text>
+    <text x="779" y="346" text-anchor="middle" class="dim">producers.delete(kind)</text>
+  </g>
+
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="222" y1="333" x2="236" y2="333"/>
+    <line x1="458" y1="333" x2="472" y2="333"/>
+    <line x1="664" y1="333" x2="678" y2="333"/>
+  </g>
+  <text x="24" y="384" class="note">关键：<tspan font-weight="700">ctx.effect(() =&gt; disposer)</tspan> 把"卸载插件"与"注销 kind"绑定——插件生命周期即能力生命周期。</text>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="392" width="852" height="130" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="418" class="sect" fill="#b45309">一切皆为插件（Everything is a Plugin）</text>
+  <text x="44" y="444" class="note">· Jobs 服务本身是一个 Cordis 插件（cordis.yml 声明加载，config 注入 defaultOwner / maxConcurrent）；</text>
+  <text x="44" y="466" class="note">·"能跑什么类型的后台任务"也是插件贡献的：subprocess（一次性）/ terminal（持久会话）/ docker-runner（可扩展）；</text>
+  <text x="44" y="488" class="warn">· 卸载插件后该 kind 立刻从 Jobs 消失：再 start 同一 kind 报"未知 kind（producer 未注册）"；</text>
+  <text x="44" y="510" class="dim">· 实验 6 用真实动作验证：ctx.plugin 加载 docker-runner → 跑通 → dispose 卸载 → 该 kind 不可启动。</text>
+</svg>
