@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="540" fill="#fafafa"/>
+  <defs>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 13px; font-weight: 700; fill: #fff; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .edge  { font-size: 10.5px; fill: #555; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .note  { font-size: 11px; fill: #555; }
+      .warn  { font-size: 11px; fill: #c0504d; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m19 · Subagent 是 capability — 三角色与"命名注册表"</text>
+
+  <!-- ============ 三角色 ============ -->
+  <!-- Consumer -->
+  <g>
+    <rect x="24" y="56" width="196" height="186" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M24,66 a10,10 0 0 1 10,-10 h176 a10,10 0 0 1 10,10 v24 h-196 z" fill="#2563eb"/>
+    <text x="122" y="78" text-anchor="middle" class="lhead">Consumer（runner）</text>
+    <text x="40" y="112" class="body">capability 无关的薄控制器</text>
+    <text x="40" y="136" class="body">• start(name, request)</text>
+    <text x="40" y="156" class="body">• list() 看有哪些能力</text>
+    <text x="40" y="180" class="body">• 监听 subagent/start·end</text>
+    <text x="40" y="204" class="body">• 持有 run 并 dispose</text>
+    <text x="40" y="228" class="dim">（不知道 Provider 怎么跑）</text>
+  </g>
+
+  <!-- Definition: SubagentRuntime -->
+  <g>
+    <rect x="316" y="56" width="224" height="186" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M316,66 a10,10 0 0 1 10,-10 h204 a10,10 0 0 1 10,10 v24 h-224 z" fill="#7c3aed"/>
+    <text x="428" y="78" text-anchor="middle" class="lhead">Definition · SubagentRuntime</text>
+    <text x="332" y="112" class="body">ctx.subagents（Service 单例）</text>
+    <text x="332" y="134" class="body">• 命名注册表 Map(name→Provider)</text>
+    <text x="332" y="154" class="body">• registerProvider → disposer</text>
+    <text x="332" y="174" class="body">• capability 校验（缺能力即抛错）</text>
+    <text x="332" y="194" class="body">• runId 铸造 + 事件转发</text>
+    <text x="332" y="214" class="body">• 零硬编码任何 Provider</text>
+    <text x="332" y="234" class="dim">（多个 Provider 按名共存）</text>
+  </g>
+
+  <!-- Providers -->
+  <g>
+    <rect x="640" y="46" width="236" height="62" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,55 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v21 h-236 z" fill="#059669"/>
+    <text x="655" y="67" class="lhead">Provider · spawn-in-process</text>
+    <text x="655" y="92" class="body">capabilities: outputSchema ✓</text>
+  </g>
+  <g>
+    <rect x="640" y="116" width="236" height="62" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,125 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v21 h-236 z" fill="#d97706"/>
+    <text x="655" y="137" class="lhead">Provider · fork</text>
+    <text x="655" y="162" class="body">capabilities: outputSchema ✗</text>
+  </g>
+  <g>
+    <rect x="640" y="186" width="236" height="62" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-dasharray="5 4"/>
+    <path d="M640,195 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v21 h-236 z" fill="#94a3b8"/>
+    <text x="655" y="207" class="lhead">Provider · acp（未注册 ⇒ 不存在）</text>
+    <text x="655" y="232" class="body">再写一个插件即可获得该能力</text>
+  </g>
+  <text x="758" y="266" text-anchor="middle" class="dim">当前注册表：spawn-in-process, fork</text>
+
+  <!-- 请求方向（上） -->
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="222" y1="118" x2="312" y2="118"/>
+    <line x1="542" y1="104" x2="636" y2="104"/>
+  </g>
+  <text x="267" y="110" text-anchor="middle" class="edge">按名申领能力</text>
+  <text x="589" y="96" text-anchor="middle" class="edge">provider.start()</text>
+
+  <!-- 回报方向（下） -->
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="312" y1="204" x2="222" y2="204"/>
+    <line x1="636" y1="212" x2="542" y2="212"/>
+  </g>
+  <text x="267" y="222" text-anchor="middle" class="edge">start·end 事件</text>
+  <text x="589" y="232" text-anchor="middle" class="edge">返回 run 句柄</text>
+
+  <!-- ============ 插件即能力 ============ -->
+  <text x="24" y="292" class="sect">插件即能力：能力是注入进来的，不是写死的</text>
+
+  <g>
+    <rect x="24" y="306" width="196" height="62" rx="8" fill="#eef3f8" stroke="#3a6ea5"/>
+    <text x="122" y="328" text-anchor="middle" class="body" font-weight="700">① 插件 apply(ctx)</text>
+    <text x="122" y="350" text-anchor="middle" class="dim">独立插件对象（有 name / apply）</text>
+  </g>
+  <g>
+    <rect x="240" y="306" width="216" height="62" rx="8" fill="#eef3f8" stroke="#3a6ea5"/>
+    <text x="348" y="328" text-anchor="middle" class="body" font-weight="700">② registerProvider(new Xxx())</text>
+    <text x="348" y="350" text-anchor="middle" class="dim">把 name 与能力交给 Runtime</text>
+  </g>
+  <g>
+    <rect x="476" y="306" width="186" height="62" rx="8" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="569" y="328" text-anchor="middle" class="body" font-weight="700">③ name 进入注册表</text>
+    <text x="569" y="350" text-anchor="middle" class="dim">start(name) 可按名分发</text>
+  </g>
+  <g>
+    <rect x="682" y="306" width="194" height="62" rx="8" fill="#fee2e2" stroke="#c0504d"/>
+    <text x="779" y="328" text-anchor="middle" class="body" font-weight="700">④ 卸载 → disposer</text>
+    <text x="779" y="350" text-anchor="middle" class="dim">providers.delete(name)</text>
+  </g>
+
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="222" y1="337" x2="236" y2="337"/>
+    <line x1="458" y1="337" x2="472" y2="337"/>
+    <line x1="664" y1="337" x2="678" y2="337"/>
+  </g>
+  <text x="24" y="388" class="note">关键：<tspan font-weight="700">ctx.effect(() =&gt; disposer)</tspan> 把"卸载插件"与"注销该 provider"绑定——插件生命周期即能力生命周期，且粒度是单个 Provider。</text>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="396" width="852" height="126" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="422" class="sect" fill="#b45309">一切皆为插件（Everything is a Plugin）</text>
+  <text x="44" y="448" class="note">· SubagentRuntime 本身是一个 Cordis 插件（cordis.yml 声明加载）；Provider 也是插件，运行时按名贡献能力；</text>
+  <text x="44" y="470" class="note">· 新增一种后端（acp / codex）只需再写一个插件，<tspan font-weight="700">SubagentRuntime 一行都不用改</tspan>；</text>
+  <text x="44" y="492" class="warn">· 卸载 fork 插件后 start('fork') 报"未注册"，而 spawn-in-process 不受影响仍在——按 Provider 粒度生灭；</text>
+  <text x="44" y="512" class="dim">· 对照 m18：Job 是"单 kind 注册表"，subagent 是"命名注册表（多者共存）+ capability 校验"。</text>
+</svg>

@@ -1,0 +1,11 @@
+
+# m20 · Workflow 可恢复 —— 配置驱动载体
+#
+# 两个 entry：
+# - `./workflow.ts`：WorkflowService（ctx.workflows），可恢复固定编排的 Definition + Consumer 层；
+#   持有命名 StageProvider 注册表 + 只追加 journal + 完整前缀校验。
+# - `./runner.ts`：主插件（Consumer + 装配），用 await ctx.plugin 加载两个 "stage provider" 插件
+#   （local-echo / remote）—— "一切皆为插件"：阶段执行驱动也是插件贡献的，换 provider 不改 Runtime。
+
+- name: './workflow.ts'
+- name: './runner.ts'
