@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="730" viewBox="0 0 900 730" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="730" fill="#fafafa"/>
+  <defs>
+    <marker id="mkA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#374151"/>
+    </marker>
+    <marker id="mkO" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#d97706"/>
+    </marker>
+    <marker id="mkG" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#059669"/>
+    </marker>
+    <marker id="mkR" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#c0504d"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .nt    { font-size: 12.5px; font-weight: 700; }
+      .nsub  { font-size: 10.5px; fill: #6b7280; }
+      .ot    { font-size: 11.5px; font-weight: 700; }
+      .osub  { font-size: 10px; fill: #6b7280; }
+      .lbl   { font-size: 10.5px; fill: #555; }
+      .lblo  { font-size: 10.5px; fill: #b45309; }
+      .note  { font-size: 11px; fill: #555; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .chip  { font-size: 9.5px; fill: #0f172a; }
+      .ctit  { font-size: 11px; font-weight: 700; fill: #1a1a2e; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m21 · Goal 决策状态机：自然停止只是提案，4 态决策各有归宿</text>
+
+  <!-- ============ ① 状态机 ============ -->
+  <text x="24" y="60" class="sect">① 主链路：worker 轮次 → 宿主观测 → 独立审查 → 4 态决策</text>
+
+  <!-- A: worker 自然停止 -->
+  <g>
+    <rect x="40" y="110" width="160" height="64" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+    <text x="120" y="137" text-anchor="middle" class="nt" fill="#7c3aed">worker 自然停止</text>
+    <text x="120" y="157" text-anchor="middle" class="nsub">（只是提案，≠ 完成）</text>
+  </g>
+  <!-- B: 宿主观测 -->
+  <g>
+    <rect x="248" y="110" width="160" height="64" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+    <text x="328" y="137" text-anchor="middle" class="nt" fill="#b45309">宿主观测字节</text>
+    <text x="328" y="157" text-anchor="middle" class="nsub">exists / content / exactMatch</text>
+  </g>
+  <!-- C: evaluator.review -->
+  <g>
+    <rect x="456" y="110" width="164" height="64" rx="10" fill="#ffffff" stroke="#0891b2" stroke-width="2"/>
+    <text x="538" y="137" text-anchor="middle" class="nt" fill="#0891b2">evaluator.review()</text>
+    <text x="538" y="157" text-anchor="middle" class="nsub">独立审查 · 只发决策</text>
+  </g>
+
+  <!-- 四条归宿 -->
+  <g>
+    <rect x="664" y="52" width="212" height="50" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="770" y="74" text-anchor="middle" class="ot" fill="#059669">complete</text>
+    <text x="770" y="91" text-anchor="middle" class="osub">goal/completed</text>
+  </g>
+  <g>
+    <rect x="664" y="116" width="212" height="50" rx="9" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="770" y="138" text-anchor="middle" class="ot" fill="#b45309">continue（未到上限）</text>
+    <text x="770" y="155" text-anchor="middle" class="osub">goal/continuation_injected</text>
+  </g>
+  <g>
+    <rect x="664" y="180" width="212" height="50" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+    <text x="770" y="202" text-anchor="middle" class="ot" fill="#475569">continue（已到上限）</text>
+    <text x="770" y="219" text-anchor="middle" class="osub">goal/handed_back(limit)</text>
+  </g>
+  <g>
+    <rect x="664" y="244" width="212" height="50" rx="9" fill="#fee2e2" stroke="#c0504d" stroke-width="2"/>
+    <text x="770" y="266" text-anchor="middle" class="ot" fill="#c0504d">impossible / failed</text>
+    <text x="770" y="283" text-anchor="middle" class="osub">goal/handed_back</text>
+  </g>
+
+  <!-- 箭头 -->
+  <g stroke="#374151" stroke-width="1.6" fill="none" marker-end="url(#mkA)">
+    <line x1="200" y1="142" x2="244" y2="142"/>
+    <line x1="408" y1="142" x2="452" y2="142"/>
+  </g>
+  <text x="222" y="135" text-anchor="middle" class="lbl">记录</text>
+  <text x="430" y="135" text-anchor="middle" class="lbl">提交</text>
+
+  <g stroke-width="1.6" fill="none">
+    <line x1="622" y1="128" x2="660" y2="82" stroke="#059669" marker-end="url(#mkG)"/>
+    <line x1="622" y1="140" x2="660" y2="141" stroke="#d97706" marker-end="url(#mkO)"/>
+    <line x1="622" y1="154" x2="660" y2="203" stroke="#9ca3af" marker-end="url(#mkA)"/>
+    <line x1="622" y1="166" x2="660" y2="266" stroke="#c0504d" marker-end="url(#mkR)"/>
+  </g>
+
+  <!-- continue 回环 -->
+  <path d="M876,141 L886,141 L886,330 L120,330 L120,178" fill="none" stroke="#d97706" stroke-width="1.6"
+        stroke-dasharray="6 4" marker-end="url(#mkO)"/>
+  <text x="445" y="324" text-anchor="middle" class="lblo">continue：把审查理由注入同一 worker session，再跑一轮（只追加新事实，不改旧历史）</text>
+
+  <!-- ============ ② 一轮的日志事实 ============ -->
+  <text x="24" y="372" class="sect">② 一轮的日志事实：固定追加这 5 条，只追加、不改写</text>
+
+  <g>
+    <rect x="22" y="384" width="160" height="34" rx="6" fill="#e7f1f5" stroke="#246b7a"/>
+    <text x="102" y="405" text-anchor="middle" class="chip">goal/round_started</text>
+    <rect x="196" y="384" width="160" height="34" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+    <text x="276" y="405" text-anchor="middle" class="chip">goal/natural_stop</text>
+    <rect x="370" y="384" width="160" height="34" rx="6" fill="#fef3c7" stroke="#d97706"/>
+    <text x="450" y="405" text-anchor="middle" class="chip">goal/observation</text>
+    <rect x="544" y="384" width="160" height="34" rx="6" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="624" y="405" text-anchor="middle" class="chip">goal/decision</text>
+    <rect x="718" y="384" width="160" height="34" rx="6" fill="#fff7e6" stroke="#d97706"/>
+    <text x="798" y="405" text-anchor="middle" class="chip">goal/continuation_injected</text>
+  </g>
+  <g stroke="#9ca3af" stroke-width="1.5" fill="none" marker-end="url(#mkA)">
+    <line x1="184" y1="401" x2="192" y2="401"/>
+    <line x1="358" y1="401" x2="366" y2="401"/>
+    <line x1="532" y1="401" x2="540" y2="401"/>
+    <line x1="706" y1="401" x2="714" y2="401"/>
+  </g>
+  <text x="24" y="440" class="note">最后一轮不再注入续跑，而是以 <tspan font-weight="700">goal/completed</tspan>（complete）或 <tspan font-weight="700">goal/handed_back</tspan>（impossible / failed / limit）收尾。</text>
+
+  <!-- ============ ③ 三条真实轨迹 ============ -->
+  <text x="24" y="470" class="sect">③ 三条真实轨迹（runner 实测输出）</text>
+
+  <g>
+    <rect x="17" y="482" width="278" height="84" rx="9" fill="#e7f1f5" stroke="#246b7a"/>
+    <text x="156" y="506" text-anchor="middle" class="ctit">实验 1 · lenient · maxRounds=4</text>
+    <text x="156" y="528" text-anchor="middle" class="dim">round1 缺 VERIFIED → continue</text>
+    <text x="156" y="548" text-anchor="middle" class="dim">round2 补齐 → complete → completed</text>
+  </g>
+  <g>
+    <rect x="311" y="482" width="278" height="84" rx="9" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="450" y="506" text-anchor="middle" class="ctit">实验 2 · strict（换插件）</text>
+    <text x="450" y="528" text-anchor="middle" class="dim">同一轨迹：空产物 → impossible</text>
+    <text x="450" y="548" text-anchor="middle" class="dim">决策变了，Loop 一行未改</text>
+  </g>
+  <g>
+    <rect x="605" y="482" width="278" height="84" rx="9" fill="#f1f5f9" stroke="#64748b"/>
+    <text x="744" y="506" text-anchor="middle" class="ctit">实验 3 · maxRounds = 1</text>
+    <text x="744" y="528" text-anchor="middle" class="dim">永远缺 VERIFIED → continue</text>
+    <text x="744" y="548" text-anchor="middle" class="dim">到上限 → handed_back(limit)</text>
+  </g>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="584" width="852" height="132" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="612" class="sect" fill="#b45309">宿主只观测、只记录、只推进，绝不冒充决策</text>
+  <text x="44" y="638" class="note">· worker 的自然停止（<tspan font-weight="700">goal/natural_stop</tspan>）只是提案，本身不具有完成语义；</text>
+  <text x="44" y="662" class="note">· 完成必须由独立 evaluator 给出 <tspan font-weight="700">complete</tspan>，宿主才追加 goal/completed；两者证据不同、互不冒充；</text>
+  <text x="44" y="686" class="note">· continue 有轮次上限（<tspan font-weight="700">maxRounds</tspan>）：到顶转为 handed_back(limit)，把控制权显式交还宿主，而不是无限循环。</text>
+</svg>

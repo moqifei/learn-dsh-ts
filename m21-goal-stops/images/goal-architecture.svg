@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="700" fill="#fafafa"/>
+  <defs>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 13px; font-weight: 700; fill: #fff; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .edge  { font-size: 10.5px; fill: #555; }
+      .note  { font-size: 11px; fill: #555; }
+      .warn  { font-size: 11px; fill: #c0504d; }
+      .st    { font-size: 11.5px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m21 · Goal 决定何时停 — 三角色 + 独立停止审查闸门</text>
+
+  <!-- ============ ① 三角色 ============ -->
+  <text x="24" y="60" class="sect">① 三角色：Definition / Provider / Consumer 各归其位</text>
+
+  <!-- Consumer / GoalLoop -->
+  <g>
+    <rect x="24" y="70" width="196" height="186" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M24,80 a10,10 0 0 1 10,-10 h176 a10,10 0 0 1 10,10 v24 h-196 z" fill="#2563eb"/>
+    <text x="122" y="92" text-anchor="middle" class="lhead">Consumer · GoalLoop</text>
+    <text x="40" y="128" class="body">• run(def, evaluator, worker)</text>
+    <text x="40" y="148" class="body">• worker 轮次 → 宿主观测</text>
+    <text x="40" y="168" class="body">• 提交 evaluator 独立审查</text>
+    <text x="40" y="188" class="body">• 按决策推进 / 续跑 / 交接</text>
+    <text x="40" y="208" class="body">• 监听 goal/event</text>
+    <text x="40" y="228" class="body">• round cap 兜住不转不停</text>
+    <text x="40" y="248" class="dim">（不判定完成）</text>
+  </g>
+
+  <!-- Definition + Consumer: GoalService -->
+  <g>
+    <rect x="316" y="70" width="224" height="186" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M316,80 a10,10 0 0 1 10,-10 h204 a10,10 0 0 1 10,10 v24 h-224 z" fill="#7c3aed"/>
+    <text x="428" y="92" text-anchor="middle" class="lhead">Definition · GoalService</text>
+    <text x="332" y="128" class="body">ctx.goals（Service 单例）</text>
+    <text x="332" y="148" class="body">• 双命名注册表 evaluator/worker</text>
+    <text x="332" y="168" class="body">• registerEvaluator → disposer</text>
+    <text x="332" y="188" class="body">• registerWorker → disposer</text>
+    <text x="332" y="208" class="body">• run = 轮次→观测→审查→决策</text>
+    <text x="332" y="228" class="body">• 只追加 goal 事件日志</text>
+    <text x="332" y="248" class="dim">（零硬编码任何审查策略）</text>
+  </g>
+
+  <!-- Providers -->
+  <g>
+    <rect x="640" y="70" width="236" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,79 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v19 h-236 z" fill="#059669"/>
+    <text x="654" y="89" class="lhead">GoalEvaluator · lenient（默认）</text>
+    <text x="654" y="117" class="body">缺验收标准 → continue（宽松）</text>
+  </g>
+  <g>
+    <rect x="640" y="136" width="236" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,145 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v19 h-236 z" fill="#d97706"/>
+    <text x="654" y="155" class="lhead">GoalEvaluator · strict（严格）</text>
+    <text x="654" y="183" class="body">空产物 → 直接 impossible</text>
+  </g>
+  <g>
+    <rect x="640" y="202" width="236" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M640,211 a9,9 0 0 1 9,-9 h218 a9,9 0 0 1 9,9 v19 h-236 z" fill="#0891b2"/>
+    <text x="654" y="221" class="lhead">WorkerProvider · sim-worker</text>
+    <text x="654" y="249" class="body">runRound → 自然停止文本（提案）</text>
+  </g>
+  <text x="758" y="278" text-anchor="middle" class="dim">当前注册表：lenient, strict ｜ sim-worker</text>
+
+  <!-- 请求方向（上） -->
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="222" y1="124" x2="312" y2="124"/>
+    <line x1="542" y1="112" x2="636" y2="106"/>
+  </g>
+  <text x="267" y="117" text-anchor="middle" class="edge">按名取策略 / 引擎</text>
+  <text x="589" y="102" text-anchor="middle" class="edge">runRound()</text>
+
+  <!-- 回报方向（下） -->
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="312" y1="212" x2="222" y2="212"/>
+    <line x1="636" y1="186" x2="542" y2="192"/>
+  </g>
+  <text x="267" y="228" text-anchor="middle" class="edge">goal/event</text>
+  <text x="589" y="208" text-anchor="middle" class="edge">自然停止 / 决策</text>
+
+  <!-- ============ ② 停止审查闸门 ============ -->
+  <text x="24" y="306" class="sect">② 停止审查闸门：worker 停止只是提案，结论必须来自独立审查</text>
+
+  <g>
+    <rect x="28" y="318" width="201" height="62" rx="8" fill="#e7f1f5" stroke="#246b7a"/>
+    <text x="128" y="342" text-anchor="middle" class="st" fill="#246b7a">① 提案</text>
+    <text x="128" y="364" text-anchor="middle" class="dim">goal/natural_stop（≠ 完成）</text>
+  </g>
+  <g>
+    <rect x="242" y="318" width="201" height="62" rx="8" fill="#fef3c7" stroke="#d97706"/>
+    <text x="342" y="342" text-anchor="middle" class="st" fill="#b45309">② 宿主观测</text>
+    <text x="342" y="364" text-anchor="middle" class="dim">exists / content / exactMatch</text>
+  </g>
+  <g>
+    <rect x="456" y="318" width="201" height="62" rx="8" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="556" y="342" text-anchor="middle" class="st" fill="#2f6f59">③ 独立审查</text>
+    <text x="556" y="364" text-anchor="middle" class="dim">evaluator.review()</text>
+  </g>
+  <g>
+    <rect x="670" y="318" width="201" height="62" rx="8" fill="#f3e8ff" stroke="#7c3aed"/>
+    <text x="770" y="342" text-anchor="middle" class="st" fill="#7c3aed">④ 结构化决策</text>
+    <text x="770" y="364" text-anchor="middle" class="dim">decision + reason + missing</text>
+  </g>
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="231" y1="349" x2="238" y2="349"/>
+    <line x1="445" y1="349" x2="452" y2="349"/>
+    <line x1="659" y1="349" x2="666" y2="349"/>
+  </g>
+
+  <text x="24" y="402" class="warn">宿主只把决策落日志并推进控制流，绝不自行判定完成；"自然停止 ≠ 完成"，完成必须经独立审查。</text>
+
+  <!-- ============ ③ 决策落地 ============ -->
+  <text x="24" y="432" class="sect">③ 决策落地：4 态 + limit 各写什么事实（只追加日志，旧行永不编辑）</text>
+
+  <g>
+    <rect x="28" y="444" width="201" height="62" rx="8" fill="#ecfdf5" stroke="#059669"/>
+    <text x="128" y="468" text-anchor="middle" class="st" fill="#059669">complete</text>
+    <text x="128" y="490" text-anchor="middle" class="dim">goal/completed</text>
+  </g>
+  <g>
+    <rect x="242" y="444" width="201" height="62" rx="8" fill="#fef3c7" stroke="#d97706"/>
+    <text x="342" y="468" text-anchor="middle" class="st" fill="#b45309">continue</text>
+    <text x="342" y="490" text-anchor="middle" class="dim">goal/continuation_injected</text>
+  </g>
+  <g>
+    <rect x="456" y="444" width="201" height="62" rx="8" fill="#f1f5f9" stroke="#64748b"/>
+    <text x="556" y="468" text-anchor="middle" class="st" fill="#475569">continue @ maxRounds</text>
+    <text x="556" y="490" text-anchor="middle" class="dim">goal/handed_back(limit)</text>
+  </g>
+  <g>
+    <rect x="670" y="444" width="201" height="62" rx="8" fill="#fee2e2" stroke="#c0504d"/>
+    <text x="770" y="468" text-anchor="middle" class="st" fill="#c0504d">impossible / failed</text>
+    <text x="770" y="490" text-anchor="middle" class="dim">goal/handed_back</text>
+  </g>
+  <g stroke="#9ca3af" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="231" y1="475" x2="238" y2="475"/>
+    <line x1="445" y1="475" x2="452" y2="475"/>
+    <line x1="659" y1="475" x2="666" y2="475"/>
+  </g>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="526" width="852" height="156" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="554" class="sect" fill="#b45309">两条主线（与全系列一致）</text>
+  <text x="44" y="580" class="note">· <tspan font-weight="700">自然停止只是提案</tspan>：worker 不返回工具调用只是协议层停止，完成必须由独立 evaluator 审查后给出；</text>
+  <text x="44" y="604" class="note">· <tspan font-weight="700">一切皆为插件</tspan>：GoalService 本身是 Cordis 插件，lenient / strict / sim-worker 也是对等插件——换审查策略或换执行引擎，<tspan font-weight="700">GoalService 与 Loop 一行未改</tspan>；</text>
+  <text x="44" y="628" class="note">· <tspan font-weight="700">宿主三重身份</tspan>：观测者（记字节级证据）、记录者（落只追加日志）、推进者（走控制流）——唯独不是决策者；</text>
+  <text x="44" y="652" class="dim">· 代码地图：goal.ts（Service + 双注册表 + GoalLoop + 决策状态机）· evaluators.ts（lenient / strict 两个插件）· workers.ts（sim-worker 插件）· runner.ts（5 个实验）·</text>
+  <text x="44" y="670" class="dim">　线上对照：packages/goal/goal（Goal service）· goal-round-driver（轮次 driver）· command-goal / tool-goal（consumer）。</text>
+</svg>

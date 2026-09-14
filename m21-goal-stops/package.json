@@ -1,0 +1,10 @@
+{
+  "name": "m21-goal-stops",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx ./node_modules/@deepseek-ai/cordis/bin.js",
+    "typecheck": "tsc --noEmit"
+  }
+}
