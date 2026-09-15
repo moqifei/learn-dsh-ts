@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="730" viewBox="0 0 900 730" role="img" aria-label="对比：硬编码外部调用 vs 外部能力即插件" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="900" height="730" fill="#fafafa"/>
+  <defs>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 13px; font-weight: 700; fill: #fff; }
+      .csub  { font-size: 10.5px; fill: #6b7280; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .note  { font-size: 11px; fill: #555; }
+      .ctit  { font-size: 11.5px; font-weight: 700; fill: #1a1a2e; }
+      .st    { font-size: 11px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m22 · 外部能力即插件：加能力 = 挂新插件，循环零改动</text>
+
+  <!-- ============ ① 对比 ============ -->
+  <text x="24" y="60" class="sect">① 对比：Agent 里硬编码外部调用 vs 外部能力即插件</text>
+
+  <!-- 反模式 -->
+  <g>
+    <rect x="24" y="76" width="410" height="196" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M24,86 a10,10 0 0 1 10,-10 h390 a10,10 0 0 1 10,10 v26 h-410 z" fill="#64748b"/>
+    <text x="44" y="100" class="lhead">① 反模式：Agent 里硬编码每个外部调用</text>
+    <text x="44" y="126" class="csub">为每个能力的连接写一段 if/else + 直连逻辑</text>
+  </g>
+  <g class="body">
+    <text x="44" y="156" class="st" fill="#475569">加能力</text>
+    <text x="414" y="156" text-anchor="end" class="dim">改 Agent Loop，写新分支</text>
+    <text x="44" y="184" class="st" fill="#475569">连接　</text>
+    <text x="414" y="184" text-anchor="end" class="dim">直连逻辑散落在循环里</text>
+    <text x="44" y="212" class="st" fill="#475569">卸载　</text>
+    <text x="414" y="212" text-anchor="end" class="dim">难撤销，改一处易回归</text>
+    <text x="44" y="240" class="st" fill="#475569">命名　</text>
+    <text x="414" y="240" text-anchor="end" class="dim">手工拼接，易冲突</text>
+  </g>
+
+  <!-- 本课 -->
+  <g>
+    <rect x="466" y="76" width="410" height="196" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M466,86 a10,10 0 0 1 10,-10 h390 a10,10 0 0 1 10,10 v26 h-410 z" fill="#2f6f59"/>
+    <text x="486" y="100" class="lhead">② 外部能力即插件（本课）</text>
+    <text x="486" y="126" class="csub">加能力 = 挂载一个新 Provider 插件，Loop 零改动</text>
+  </g>
+  <g class="body">
+    <text x="486" y="156" class="st" fill="#2f6f59">加能力</text>
+    <text x="856" y="156" text-anchor="end" class="dim">挂载一个新 Provider 插件</text>
+    <text x="486" y="184" class="st" fill="#2f6f59">连接　</text>
+    <text x="856" y="184" text-anchor="end" class="dim">Provider 独占连接细节</text>
+    <text x="486" y="212" class="st" fill="#2f6f59">卸载　</text>
+    <text x="856" y="212" text-anchor="end" class="dim">注册即 effect，卸载即撤销</text>
+    <text x="486" y="240" class="st" fill="#2f6f59">命名　</text>
+    <text x="856" y="240" text-anchor="end" class="dim">cap__&lt;provider&gt;__&lt;localName&gt;</text>
+  </g>
+
+  <g stroke="#2f6f59" stroke-width="1.6" fill="none" marker-end="url(#arrA)">
+    <line x1="434" y1="174" x2="464" y2="174"/>
+  </g>
+
+  <!-- ============ ② 主链路六步 ============ -->
+  <text x="24" y="300" class="sect">② 主链路六步：每个外部能力都走同一条路径</text>
+
+  <g>
+    <rect x="29" y="316" width="132" height="64" rx="9" fill="#e7f1f5" stroke="#2563eb" stroke-width="1.6"/>
+    <text x="95" y="340" text-anchor="middle" class="st" fill="#2563eb">① 发现</text>
+    <text x="95" y="362" text-anchor="middle" class="dim">listTools()</text>
+  </g>
+  <g>
+    <rect x="171" y="316" width="132" height="64" rx="9" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.6"/>
+    <text x="237" y="340" text-anchor="middle" class="st" fill="#7c3aed">② 命名</text>
+    <text x="237" y="362" text-anchor="middle" class="dim">cap__&lt;p&gt;__local</text>
+  </g>
+  <g>
+    <rect x="313" y="316" width="132" height="64" rx="9" fill="#fef3c7" stroke="#d97706" stroke-width="1.6"/>
+    <text x="379" y="340" text-anchor="middle" class="st" fill="#b45309">③ 挂载</text>
+    <text x="379" y="362" text-anchor="middle" class="dim">进 ctx.tools</text>
+  </g>
+  <g>
+    <rect x="455" y="316" width="132" height="64" rx="9" fill="#fee2e2" stroke="#c0504d" stroke-width="1.6"/>
+    <text x="521" y="340" text-anchor="middle" class="st" fill="#c0504d">④ 投影</text>
+    <text x="521" y="362" text-anchor="middle" class="dim">schemas()</text>
+  </g>
+  <g>
+    <rect x="597" y="316" width="132" height="64" rx="9" fill="#e8f3ee" stroke="#2f6f59" stroke-width="1.6"/>
+    <text x="663" y="340" text-anchor="middle" class="st" fill="#2f6f59">⑤ 分发</text>
+    <text x="663" y="362" text-anchor="middle" class="dim">execute(name)</text>
+  </g>
+  <g>
+    <rect x="739" y="316" width="132" height="64" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+    <text x="805" y="340" text-anchor="middle" class="st" fill="#059669">⑥ 变更</text>
+    <text x="805" y="362" text-anchor="middle" class="dim">tools/change</text>
+  </g>
+  <g stroke="#9ca3af" stroke-width="1.5" fill="none" marker-end="url(#arrA)">
+    <line x1="161" y1="348" x2="168" y2="348"/>
+    <line x1="303" y1="348" x2="310" y2="348"/>
+    <line x1="445" y1="348" x2="452" y2="348"/>
+    <line x1="587" y1="348" x2="594" y2="348"/>
+    <line x1="729" y1="348" x2="736" y2="348"/>
+  </g>
+
+  <!-- ============ ③ 六个实验 ============ -->
+  <text x="24" y="406" class="sect">③ 六个实验（runner 实测输出）</text>
+
+  <g>
+    <rect x="18" y="422" width="278" height="84" rx="9" fill="#e7f1f5" stroke="#2563eb"/>
+    <text x="157" y="446" text-anchor="middle" class="ctit">实验 1 · 发现</text>
+    <text x="157" y="468" text-anchor="middle" class="dim">namespaces() = core/mcp/web/lsp</text>
+    <text x="157" y="488" text-anchor="middle" class="dim">四方贡献进同一注册表</text>
+  </g>
+  <g>
+    <rect x="311" y="422" width="278" height="84" rx="9" fill="#f3e8ff" stroke="#7c3aed"/>
+    <text x="450" y="446" text-anchor="middle" class="ctit">实验 2 · 投影</text>
+    <text x="450" y="468" text-anchor="middle" class="dim">schemas() 把 core 与 external 混排</text>
+    <text x="450" y="488" text-anchor="middle" class="dim">模型看不到来源差异</text>
+  </g>
+  <g>
+    <rect x="604" y="422" width="278" height="84" rx="9" fill="#fef3c7" stroke="#d97706"/>
+    <text x="743" y="446" text-anchor="middle" class="ctit">实验 3 · 执行 core</text>
+    <text x="743" y="468" text-anchor="middle" class="dim">cap__core__add(2,3) = 5</text>
+    <text x="743" y="488" text-anchor="middle" class="dim">进程内闭包，调度者解耦</text>
+  </g>
+
+  <g>
+    <rect x="18" y="518" width="278" height="84" rx="9" fill="#fee2e2" stroke="#c0504d"/>
+    <text x="157" y="542" text-anchor="middle" class="ctit">实验 4 · 执行 mcp</text>
+    <text x="157" y="564" text-anchor="middle" class="dim">cap__mcp__length("hello world") = 11</text>
+    <text x="157" y="584" text-anchor="middle" class="dim">子进程 / 连接，调用同 core</text>
+  </g>
+  <g>
+    <rect x="311" y="518" width="278" height="84" rx="9" fill="#e8f3ee" stroke="#2f6f59"/>
+    <text x="450" y="542" text-anchor="middle" class="ctit">实验 5 · 执行 web</text>
+    <text x="450" y="564" text-anchor="middle" class="dim">cap__web__status() = {ok:true,...}</text>
+    <text x="450" y="584" text-anchor="middle" class="dim">真实 HTTP（回环 127.0.0.1）</text>
+  </g>
+  <g>
+    <rect x="604" y="518" width="278" height="84" rx="9" fill="#ecfdf5" stroke="#059669"/>
+    <text x="743" y="542" text-anchor="middle" class="ctit">实验 6 · 执行 lsp</text>
+    <text x="743" y="564" text-anchor="middle" class="dim">cap__lsp__symbol("Capability")</text>
+    <text x="743" y="584" text-anchor="middle" class="dim">真实 JSON-RPC 子进程</text>
+  </g>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="620" width="852" height="100" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="648" class="sect" fill="#b45309">外部能力不是特殊分支，而是"贡献到同一棵树"的插件</text>
+  <text x="44" y="672" class="note">· 加能力 = 挂载新 Provider 插件（register 即 effect）；卸载即撤销其工具 + emit('tools/change')，其余能力纹丝不动；</text>
+  <text x="44" y="696" class="note">· Agent Loop 只调 schemas() / execute(name,args)，从不区分 cap__core__ / cap__mcp__ / cap__web__ / cap__lsp__。</text>
+</svg>

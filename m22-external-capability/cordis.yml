@@ -1,0 +1,14 @@
+- name: './external.ts'
+  config:
+    server:
+      name: local-demo
+- name: './providers.ts'
+  config:
+    web:
+      baseUrl: http://127.0.0.1:8765
+      path: /status.json
+    lsp:
+      command: node
+      args: ['./lsp-server.js']
+- name: './runner.ts'
+  config: {}
