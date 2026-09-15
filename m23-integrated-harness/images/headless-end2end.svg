@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="790" viewBox="0 0 940 790" role="img" aria-label="m23 headless profile：一个任务端到端，能力全是插件" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="940" height="790" fill="#fafafa"/>
+  <defs>
+    <marker id="arrB" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#0b7285"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 12.5px; font-weight: 700; fill: #fff; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .note  { font-size: 11px; fill: #555; }
+      .ctit  { font-size: 11.5px; font-weight: 700; fill: #1a1a2e; }
+      .st    { font-size: 11px; font-weight: 700; }
+      .mono  { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 10.5px; fill: #374151; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m23 · headless profile — 一个任务端到端，能力全是插件</text>
+  <text x="24" y="56" class="dim">不引入任何新能力，只消费已装配好的树：跑任务 → 自省 → 冷投影 → 退出（换 tui / web 只换消费端）</text>
+
+  <!-- ============ ① 任务与执行 ============ -->
+  <text x="24" y="88" class="sect">① 任务与执行：ctx.agent 协调四步工具，每步过 policy 守卫</text>
+
+  <!-- task -->
+  <g>
+    <rect x="24" y="100" width="280" height="72" rx="10" fill="#e3fafc" stroke="#0b7285" stroke-width="1.6"/>
+    <text x="40" y="124" class="ctit">task（来自 cordis.yml 的 config）</text>
+    <text x="40" y="146" class="dim">请加载 report-format 技能，委派研究，</text>
+    <text x="40" y="164" class="dim">写出并读回 report.txt。</text>
+  </g>
+
+  <g stroke="#0b7285" stroke-width="2" fill="none" marker-end="url(#arrB)">
+    <line x1="164" y1="172" x2="164" y2="184"/>
+  </g>
+
+  <!-- loop -->
+  <g>
+    <rect x="24" y="188" width="280" height="300" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="40" y="214" class="ctit">ctx.agent（m12 Loop 即插件）</text>
+    <text x="40" y="236" class="dim">每一轮：render prompt → call llm</text>
+    <text x="40" y="254" class="dim">→ 按 tool_calls 执行 → 落到 session</text>
+
+    <line x1="40" y1="270" x2="288" y2="270" stroke="#e5e7eb"/>
+
+    <text x="40" y="292" class="body">① load_skill　　　（skills, m15）</text>
+    <text x="40" y="318" class="body">② delegate_research（subagents, m19）</text>
+    <text x="40" y="344" class="body">③ write_file　　　（workspace, m10）</text>
+    <text x="40" y="370" class="body">④ read_file　　　 （workspace, m10）</text>
+
+    <rect x="40" y="382" width="248" height="46" rx="6" fill="#fff4e6" stroke="#f08c00"/>
+    <text x="52" y="400" class="mono" fill="#a8590a">每步过 ctx.policy 守卫</text>
+    <text x="52" y="418" class="mono" fill="#a8590a">拒绝越根写 → 安全回退</text>
+
+    <text x="40" y="448" class="dim">外部能力挂在同一棵树（Loop 不分支）：</text>
+    <text x="40" y="466" class="mono">cap__core__add / cap__web__status</text>
+    <text x="40" y="482" class="mono">cap__lsp__symbol / cap__mcp__ping</text>
+  </g>
+
+  <!-- evidence A: tool tree -->
+  <g>
+    <rect x="320" y="100" width="596" height="124" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M320,110 a10,10 0 0 1 10,-10 h576 a10,10 0 0 1 10,10 v24 h-596 z" fill="#7c3aed"/>
+    <text x="336" y="124" class="lhead">① 工具树快照（ctx.tools 自省）</text>
+    <text x="340" y="150" class="mono">load_skill · delegate_research · write_file · read_file</text>
+    <text x="340" y="172" class="mono">cap__core__add · cap__web__status · cap__lsp__symbol · cap__mcp__ping</text>
+    <text x="340" y="196" class="dim">技能 / 子代理 / 工作区 / 外部能力 四类来源混进同一棵树</text>
+    <text x="340" y="214" class="dim">→ 这就是「一切皆为插件」在运行时可见的直接证据</text>
+  </g>
+
+  <!-- evidence B: observability -->
+  <g>
+    <rect x="320" y="236" width="596" height="124" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M320,246 a10,10 0 0 1 10,-10 h576 a10,10 0 0 1 10,10 v24 h-596 z" fill="#d97706"/>
+    <text x="336" y="260" class="lhead">② 可观测性（订阅统一的 session/event 总线）</text>
+    <text x="340" y="286" class="mono">tracing spans: run · llm-request · tool:load_skill · tool:delegate_research · …</text>
+    <text x="340" y="308" class="mono">metrics: {"toolCalls":4,"llmRequests":5,"toolErrors":1}</text>
+    <text x="340" y="332" class="dim">全部由事件流派生，不耦合具体能力（m08 总线 / m13 追踪 / m14 指标）</text>
+    <text x="340" y="350" class="dim">→ 换任何能力插件，观测口径不变</text>
+  </g>
+
+  <!-- evidence C: cold projection -->
+  <g>
+    <rect x="320" y="372" width="596" height="116" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M320,382 a10,10 0 0 1 10,-10 h576 a10,10 0 0 1 10,10 v24 h-596 z" fill="#2f6f59"/>
+    <text x="336" y="396" class="lhead">③ 冷投影（m17 追加落盘）</text>
+    <text x="340" y="422" class="mono">state/session.jsonl（append-only）→ 进程退出不丢</text>
+    <text x="340" y="446" class="mono">重放 30 events / 4 tools / 5 llm-req → finalTurn 与运行时一致</text>
+    <text x="340" y="470" class="dim">profile 只是树的一个消费端：换 tui / web 不动任何能力插件</text>
+  </g>
+
+  <!-- ============ ② 硬证据 ============ -->
+  <text x="24" y="512" class="sect">② 两条硬证据：同一轮运行 + 冷重放，互相印证</text>
+
+  <g>
+    <rect x="24" y="524" width="892" height="104" rx="10" fill="#ebfbee" stroke="#2f9e44" stroke-width="1.6"/>
+    <text x="44" y="552" class="ctit">校验结果</text>
+    <text x="44" y="580" class="body">✓ 冷投影与运行时投影一致 —— eventCount: 30，requestCount: 5，status: completed</text>
+    <text x="44" y="606" class="body">✓ report.txt 存在且内容正确 —— TITLE=Integrated Harness Evidence … STATUS=VERIFIED</text>
+  </g>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="652" width="892" height="110" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="680" class="sect" fill="#b45309">本课结论</text>
+  <text x="44" y="704" class="note">· <tspan font-weight="700">headless 不引入任何新能力</tspan>，只消费已装配好的树 —— 能力 = 插件，harness = 树，profile = 消费端；</text>
+  <text x="44" y="726" class="note">· <tspan font-weight="700">端到端证据（report.txt + 冷投影 + 可观测性）</tspan> 证明「一切皆为插件」是运行时可验证的事实，不是口号。</text>
+  <text x="44" y="750" class="dim">代码地图：cordis.yml（装配清单）· services.ts（能力服务）· plugin-*.ts（能力插件）· headless.ts（profile 消费端）· lsp-server.js（教学版子进程）</text>
+</svg>

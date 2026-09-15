@@ -1,0 +1,20 @@
+{
+  "name": "m23-integrated-harness",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx ./node_modules/@deepseek-ai/cordis/bin.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/cordis-plugin-include": "^1.0.6",
+    "@deepseek-ai/cordis-plugin-loader": "^1.0.2",
+    "tsx": "^4.23.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
+}

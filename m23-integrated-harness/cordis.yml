@@ -1,0 +1,60 @@
+# m23 · 集成快照 · cordis.yml（与 s24 profile.json 同构）
+#
+# 顶层是数组，每个条目 { name, config? }。name 指向一个默认导出插件（函数或对象）的 .ts 文件，
+# 加载器平铺把它们挂到同一根 Context。配置顺序与依赖图无关：cordis 等 inject 声明的能力就绪
+# 再激活插件。这正是"树能用一份清单随意装配"的关键。
+#
+# 本快照覆盖 m07–m22 的代表能力：
+#   model(m07) session(m08) prompt-registry(m09) tool-registry(m10)
+#   workspace(m10) skills(m15) policy(m11) persistence(m17)
+#   subagent(m19) agent-loop(m12) capability-external(m22)
+#   mcp(m22 延伸) events(m08) metrics(m14) tracing(m13)
+# 顺序刻意打乱依赖先后，证明装配解耦（与 s24 一致）。
+
+- name: ./plugin-agent-loop.ts
+  config: {}
+- name: ./plugin-capability-tools.ts
+  config: {}
+- name: ./plugin-policy.ts
+  config: {}
+- name: ./plugin-skills.ts
+  config:
+    root: ./skills
+- name: ./plugin-workspace.ts
+  config:
+    root: ./state/workspace
+- name: ./plugin-tool-registry.ts
+  config: {}
+- name: ./plugin-prompt-registry.ts
+  config: {}
+- name: ./plugin-model.ts
+  config: {}
+- name: ./plugin-session.ts
+  config: {}
+- name: ./plugin-persistence.ts
+  config:
+    path: ./state/session.jsonl
+- name: ./plugin-subagent.ts
+  config: {}
+- name: ./plugin-capability-external.ts
+  config:
+    web:
+      baseUrl: http://127.0.0.1:8765
+      path: /status.json
+    lsp:
+      command: node
+      args: ['./lsp-server.js']
+- name: ./plugin-mcp.ts
+  config: {}
+- name: ./plugin-events.ts
+  config: {}
+- name: ./plugin-metrics.ts
+  config: {}
+- name: ./plugin-tracing.ts
+  config: {}
+- name: './headless.ts'
+  config:
+    task: '请加载 report-format 技能，委派研究，写出并读回 report.txt。'
+    workspaceRoot: ./state/workspace
+    skillsRoot: ./skills
+    persistencePath: ./state/session.jsonl

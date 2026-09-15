@@ -1,0 +1,4 @@
+TITLE=Integrated Harness Evidence
+FACT_ONE=Append-only events support cold projection.
+FACT_TWO=Tool policy runs before execution.
+STATUS=VERIFIED

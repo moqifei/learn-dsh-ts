@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="890" viewBox="0 0 940 890" role="img" aria-label="m23 集成 Harness：用 cordis.yml 把 m07–m22 装配成一棵完整树" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="940" height="890" fill="#fafafa"/>
+  <defs>
+    <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#9ca3af"/>
+    </marker>
+    <style>
+      .title { font-size: 19px; font-weight: 700; fill: #1a1a2e; }
+      .sect  { font-size: 14px; font-weight: 700; fill: #1a1a2e; }
+      .lhead { font-size: 12.5px; font-weight: 700; fill: #fff; }
+      .body  { font-size: 11.5px; fill: #374151; }
+      .dim   { font-size: 10.5px; fill: #6b7280; }
+      .note  { font-size: 11px; fill: #555; }
+      .ctit  { font-size: 11.5px; font-weight: 700; fill: #1a1a2e; }
+      .st    { font-size: 11px; font-weight: 700; }
+      .mono  { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 10.5px; fill: #374151; }
+    </style>
+  </defs>
+
+  <text x="24" y="32" class="title">m23 · 集成 Harness — 一份 cordis.yml，把 m07–m22 装配成一棵完整树</text>
+  <text x="24" y="56" class="dim">14 个插件平铺挂到同一根 Context；加载顺序与依赖图无关（inject 决定就绪时机）· 与真实工程 profile-boot 同构</text>
+
+  <!-- ============ ① 装配清单 ============ -->
+  <text x="24" y="88" class="sect">① 装配清单：cordis.yml 是「树的清单」，不是配置</text>
+
+  <!-- ①-left -->
+  <g>
+    <rect x="24" y="100" width="330" height="300" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M24,110 a10,10 0 0 1 10,-10 h310 a10,10 0 0 1 10,10 v24 h-330 z" fill="#0b7285"/>
+    <text x="40" y="124" class="lhead">cordis.yml（顶层数组）</text>
+
+    <g class="mono">
+      <text x="40" y="160">- agent-loop</text>
+      <text x="40" y="182">- capability-tools</text>
+      <text x="40" y="204">- tool-registry</text>
+      <text x="40" y="226">- prompt-registry</text>
+      <text x="40" y="248">- workspace</text>
+      <text x="40" y="270">- skills</text>
+      <text x="40" y="292">- policy</text>
+      <text x="40" y="314">- model</text>
+
+      <text x="196" y="160">- session</text>
+      <text x="196" y="182">- persistence</text>
+      <text x="196" y="204">- subagent</text>
+      <text x="196" y="226">- capability-external</text>
+      <text x="196" y="248">- mcp</text>
+      <text x="196" y="270">- events</text>
+      <text x="196" y="292">- metrics</text>
+      <text x="196" y="314">- tracing</text>
+    </g>
+
+    <rect x="40" y="332" width="290" height="26" rx="6" fill="#e3fafc" stroke="#0b7285"/>
+    <text x="52" y="349" class="mono" fill="#0b4f6c">- headless（profile 消费端，也是一个插件）</text>
+
+    <text x="40" y="376" class="dim">每个条目 { name, config? }，地位完全相同</text>
+    <text x="40" y="392" class="dim">顺序刻意打乱依赖先后 —— 证明装配与依赖图无关</text>
+  </g>
+
+  <!-- ①-right -->
+  <g>
+    <rect x="374" y="100" width="542" height="300" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M374,110 a10,10 0 0 1 10,-10 h522 a10,10 0 0 1 10,10 v24 h-542 z" fill="#d97706"/>
+    <text x="390" y="124" class="lhead">加载器的三个动作（与真实 profile-boot 同构）</text>
+
+    <text x="394" y="160" class="ctit">① 读清单</text>
+    <text x="466" y="160" class="dim">顶层是数组，逐条 { name, config? }；name 指向默认导出插件的 .ts</text>
+
+    <text x="394" y="196" class="ctit">② 挂载</text>
+    <text x="466" y="196" class="dim">ctx.plugin(load(name), config) —— 逐个挂到同一根 Context 上</text>
+
+    <text x="394" y="232" class="ctit">③ 激活</text>
+    <text x="466" y="232" class="dim">等 inject 声明的依赖就绪 → 插件 active，能力随之挂进 ctx</text>
+
+    <line x1="394" y1="256" x2="896" y2="256" stroke="#e5e7eb"/>
+
+    <text x="394" y="282" class="note">· 加载顺序 ≠ 依赖顺序：model 写在 session 前，也不会先建 ctx.llm</text>
+    <text x="394" y="306" class="note">· 没有任何一个是「运行时内建」——所有条目地位完全相同</text>
+    <text x="394" y="330" class="note">· 换 profile（headless / tui / web）只是换消费端，能力插件一个不动</text>
+
+    <text x="394" y="362" class="dim">真实工程：*.cordis.yml 经 loadConfig() + useConfig() 合并后，由 profile-boot.ts 交给 cordis 加载器平铺加载</text>
+    <text x="394" y="384" class="dim">本课把这套「跨 npm 包装配」压缩成「同目录十几个 .ts 平铺装配」，装配方式完全一致</text>
+  </g>
+
+  <!-- ============ ② 主链路 ============ -->
+  <text x="24" y="424" class="sect">② 主链路：读清单 → 平铺挂载 → 依赖就绪 → 能力进 ctx → profile 消费</text>
+
+  <g>
+    <rect x="24" y="436" width="170" height="92" rx="10" fill="#e3fafc" stroke="#0b7285" stroke-width="1.6"/>
+    <text x="109" y="462" text-anchor="middle" class="ctit">① 读清单</text>
+    <text x="109" y="486" text-anchor="middle" class="dim">cordis.yml 顶层数组</text>
+    <text x="109" y="504" text-anchor="middle" class="dim">{ name, config? }</text>
+    <text x="109" y="522" text-anchor="middle" class="dim">name → 插件 .ts</text>
+  </g>
+  <g>
+    <rect x="204" y="436" width="170" height="92" rx="10" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.6"/>
+    <text x="289" y="462" text-anchor="middle" class="ctit">② 平铺挂载</text>
+    <text x="289" y="486" text-anchor="middle" class="dim">ctx.plugin(load, cfg)</text>
+    <text x="289" y="504" text-anchor="middle" class="dim">挂到同一根 Context</text>
+    <text x="289" y="522" text-anchor="middle" class="dim">逐个挂载，无先后</text>
+  </g>
+  <g>
+    <rect x="384" y="436" width="170" height="92" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.6"/>
+    <text x="469" y="462" text-anchor="middle" class="ctit">③ 依赖就绪</text>
+    <text x="469" y="486" text-anchor="middle" class="dim">inject 等依赖</text>
+    <text x="469" y="504" text-anchor="middle" class="dim">顺序与依赖图无关</text>
+    <text x="469" y="522" text-anchor="middle" class="dim">就绪即 active</text>
+  </g>
+  <g>
+    <rect x="564" y="436" width="170" height="92" rx="10" fill="#e8f3ee" stroke="#2f6f59" stroke-width="1.6"/>
+    <text x="649" y="462" text-anchor="middle" class="ctit">④ 能力进 ctx</text>
+    <text x="649" y="486" text-anchor="middle" class="dim">ctx.llm / session</text>
+    <text x="649" y="504" text-anchor="middle" class="dim">ctx.tools 一棵树</text>
+    <text x="649" y="522" text-anchor="middle" class="dim">external 同树</text>
+  </g>
+  <g>
+    <rect x="744" y="436" width="170" height="92" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+    <text x="829" y="462" text-anchor="middle" class="ctit">⑤ profile 消费</text>
+    <text x="829" y="486" text-anchor="middle" class="dim">headless</text>
+    <text x="829" y="504" text-anchor="middle" class="dim">跑任务 → 自省</text>
+    <text x="829" y="522" text-anchor="middle" class="dim">→ 冷投影 → 退出</text>
+  </g>
+
+  <g stroke="#9ca3af" stroke-width="1.5" fill="none" marker-end="url(#arrA)">
+    <line x1="194" y1="482" x2="200" y2="482"/>
+    <line x1="374" y1="482" x2="380" y2="482"/>
+    <line x1="554" y1="482" x2="560" y2="482"/>
+    <line x1="734" y1="482" x2="740" y2="482"/>
+  </g>
+
+  <!-- ============ ③ 同一棵 ctx.tools ============ -->
+  <text x="24" y="552" class="sect">③ 同一棵 ctx.tools：四类来源混排，Loop 不区分来源</text>
+
+  <g>
+    <rect x="24" y="564" width="892" height="180" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="44" y="592" class="ctit">运行时自省快照（ctx.tools）—— 四类来源混进同一棵树</text>
+
+    <text x="52" y="624" class="ctit">skills（m15）</text>
+    <text x="888" y="624" text-anchor="end" class="mono">load_skill</text>
+
+    <text x="52" y="652" class="ctit">subagents（m19）</text>
+    <text x="888" y="652" text-anchor="end" class="mono">delegate_research</text>
+
+    <text x="52" y="680" class="ctit">workspace（m10）</text>
+    <text x="888" y="680" text-anchor="end" class="mono">write_file · read_file</text>
+
+    <text x="52" y="708" class="ctit">external（m22）</text>
+    <text x="888" y="708" text-anchor="end" class="mono">cap__core__add · cap__web__status · cap__lsp__symbol · cap__mcp__ping</text>
+
+    <text x="52" y="732" class="dim">Loop 只调 schemas() / execute(name)，从不区分工具来自技能、子代理、工作区还是外部能力。</text>
+  </g>
+
+  <!-- ============ 结论带 ============ -->
+  <rect x="24" y="762" width="892" height="112" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="44" y="790" class="sect" fill="#b45309">一切皆为插件（本课主结论）</text>
+  <text x="44" y="814" class="note">· <tspan font-weight="700">harness = 插件平铺挂到同一根 Context 后的树</tspan>；ctx = 其中一根树枝；能力 = 一个经 ctx.effect 挂载 / 撤销的插件；</text>
+  <text x="44" y="836" class="note">· <tspan font-weight="700">加能力 = 加一行清单条目</tspan>，profile 一行不动；换 profile = 换消费端，能力插件一个不动。</text>
+  <text x="44" y="860" class="dim">代码地图：cordis.yml（装配清单）· services.ts（能力服务）· plugin-*.ts（能力插件）· headless.ts（profile 消费端）· lsp-server.js（教学版子进程）</text>
+</svg>
